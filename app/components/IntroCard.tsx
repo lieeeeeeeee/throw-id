@@ -1,0 +1,242 @@
+"use client";
+
+import type { CardDraft, Gender } from "../lib/schema";
+import { CARD_HEIGHT, CARD_WIDTH, genderLabel } from "../lib/schema";
+import { ICON_PLACEHOLDER } from "../lib/placeholders";
+
+function ratingLabel(text?: string): string {
+  const t = text?.trim();
+  if (!t) return "レート --";
+  return `レート ${t}`;
+}
+
+function experienceLabel(text?: string): string {
+  const t = text?.trim();
+  if (!t) return "歴 --";
+  return `歴 ${t}`;
+}
+
+function badge(text: string, tone: "dark" | "light" = "light") {
+  const base =
+    "inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold tracking-tight";
+  if (tone === "dark") {
+    return (
+      <span className={`${base} bg-zinc-900 text-white/95`}>{text}</span>
+    );
+  }
+  return (
+    <span className={`${base} bg-white/75 text-zinc-900 ring-1 ring-black/5`}>
+      {text}
+    </span>
+  );
+}
+
+function chip(text: string, muted = false) {
+  return <Chip text={text} muted={muted} />;
+}
+
+function Chip({ text, muted }: { text: string; muted?: boolean }) {
+  return (
+    <span
+      className={[
+        "inline-flex items-center rounded-full px-3 py-1 text-[12px] font-medium",
+        muted
+          ? "bg-white/55 text-zinc-600 ring-1 ring-black/5"
+          : "bg-white/80 text-zinc-900 ring-1 ring-black/5",
+      ].join(" ")}
+    >
+      {text}
+    </span>
+  );
+}
+
+function genderOrPlaceholder(gender?: Gender): string {
+  if (!gender) return "性別 --";
+  return `性別 ${genderLabel(gender)}`;
+}
+
+function ageOrPlaceholder(d: CardDraft): string {
+  const t = d.age?.trim();
+  if (!t) return "年齢 --";
+  return `年齢 ${t}`;
+}
+
+function textOrPlaceholder(label: string, value?: string, placeholder = "--") {
+  const v = value?.trim();
+  if (!v) return `${label} ${placeholder}`;
+  return `${label} ${v}`;
+}
+
+function ImageBox({
+  label,
+  dataUrl,
+}: {
+  label: string;
+  dataUrl: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="h-[120px] w-[170px] overflow-hidden rounded-2xl bg-white/60 p-2 ring-1 ring-black/5">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={dataUrl}
+          alt={label}
+          className="h-full w-full object-contain"
+          draggable={false}
+        />
+      </div>
+      <div className="text-[11px] font-semibold text-zinc-700">{label}</div>
+    </div>
+  );
+}
+
+export function IntroCard({ data }: { data: CardDraft }) {
+  const iconSrc = data.iconDataUrl ?? ICON_PLACEHOLDER;
+
+  const playStyle = data.playStyle?.trim();
+  const favoriteGame = data.favoriteGame?.trim();
+  const thumbs = [
+    { label: "ライブテーマ", dataUrl: data.liveThemeImageDataUrl },
+    { label: "ファンダーツ", dataUrl: data.funDartsImageDataUrl },
+    { label: "ダーツカード", dataUrl: data.dartsCardImageDataUrl },
+  ].filter((t): t is { label: string; dataUrl: string } => Boolean(t.dataUrl));
+  const hasAnyThumb = thumbs.length > 0;
+
+  const favPlayers =
+    data.favoritePlayers.length > 0
+      ? data.favoritePlayers.slice(0, 3)
+      : ["--"];
+
+  const bestNums = data.bestNumber?.trim() || "--";
+
+  const comment = data.comment?.trim() || "一言コメント";
+
+  return (
+    <div
+      className="relative overflow-hidden rounded-[28px] shadow-[0_18px_48px_rgba(0,0,0,0.12)] ring-1 ring-black/5"
+      style={{
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+        backgroundImage:
+          "linear-gradient(135deg,#fff1f2 0%,#eef2ff 45%,#ecfeff 100%),radial-gradient(circle at 1px 1px, rgba(17,24,39,0.10) 1px, transparent 0)",
+        backgroundSize: "auto, 18px 18px",
+      }}
+    >
+      <div className="absolute inset-0 bg-white/25" />
+
+      <div className="relative flex h-full min-h-0 flex-col box-border px-[28px] py-[26px]">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <div className="h-[92px] w-[92px] overflow-hidden rounded-[26px] bg-white/70 ring-1 ring-black/5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={iconSrc}
+              alt="icon"
+              className="h-full w-full object-cover"
+              draggable={false}
+            />
+          </div>
+
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate text-[28px] font-extrabold tracking-tight text-zinc-900">
+                  {data.displayName?.trim() || "なまえ"}
+                </div>
+                <div className="mt-1 flex flex-wrap gap-2">
+                  {badge(ratingLabel(data.rating), "dark")}
+                  {badge(experienceLabel(data.dartsExperience))}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {badge(genderOrPlaceholder(data.gender))}
+              {badge(ageOrPlaceholder(data))}
+              {badge(textOrPlaceholder("エリア", data.area))}
+            </div>
+          </div>
+        </div>
+
+        {/* Rows (行単位で高さを揃え、コメントは下端まで伸ばす) */}
+        <div
+          className="mt-5 grid min-h-0 flex-1 gap-4"
+          style={{
+            gridTemplateRows:
+              "minmax(132px, auto) minmax(132px, auto) minmax(0, 1fr)",
+          }}
+        >
+          {/* Row 1: プレイスタイル / 好きなゲーム（高さ・位置を揃える） */}
+          <div className="grid min-h-[132px] grid-cols-2 gap-4">
+            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-4 ring-1 ring-black/5 box-border">
+              <div className="text-[11px] font-bold text-zinc-600">
+                プレイスタイル
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {playStyle ? <Chip text={playStyle} /> : <Chip text="未設定" muted />}
+              </div>
+            </div>
+            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-4 ring-1 ring-black/5 box-border">
+              <div className="text-[11px] font-bold text-zinc-600">
+                好きなゲーム
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {favoriteGame ? (
+                  <Chip text={favoriteGame} />
+                ) : (
+                  <Chip text="未設定" muted />
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2: 好きな選手 と（バレル/得意ナンバー）を上下揃え */}
+          <div className="grid min-h-[132px] grid-cols-2 gap-4">
+            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-4 ring-1 ring-black/5 box-border">
+              <div className="text-[11px] font-bold text-zinc-600">好きな選手</div>
+              <div className="mt-2">
+                <div className="line-clamp-3 text-[14px] font-semibold text-zinc-900">
+                  {favPlayers.join(" / ")}
+                </div>
+              </div>
+            </div>
+            <div className="grid h-full grid-rows-2 gap-3">
+              <div className="overflow-hidden rounded-3xl bg-white/55 p-4 ring-1 ring-black/5 box-border">
+                <div className="text-[11px] font-bold text-zinc-600">バレル</div>
+                <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
+                  {data.barrel?.trim() || "--"}
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-3xl bg-white/55 p-4 ring-1 ring-black/5 box-border">
+                <div className="text-[11px] font-bold text-zinc-600">得意ナンバー</div>
+                <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
+                  {bestNums}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Row 3: コメント（Row2のbottomから一定距離→カードのbottomまで広げる） */}
+          <div className="min-h-0 overflow-hidden rounded-3xl bg-white/60 p-4 ring-1 ring-black/5">
+            <div className="flex h-full min-h-0 flex-col overflow-hidden">
+              <div className="text-[11px] font-bold text-zinc-600">コメント</div>
+              <div className="mt-2 line-clamp-8 break-words text-[15px] font-semibold leading-6 text-zinc-900">
+                {comment}
+              </div>
+
+              {hasAnyThumb ? (
+                <div className="mt-auto pt-4">
+                  <div className="flex gap-3">
+                    {thumbs.map((t) => (
+                      <ImageBox key={t.label} label={t.label} dataUrl={t.dataUrl} />
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
