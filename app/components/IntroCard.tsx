@@ -215,24 +215,24 @@ export function IntroCard({ data }: { data: CardDraft }) {
             </div>
           </div>
 
-          {/* Row 3: コメント（Row2のbottomから一定距離→カードのbottomまで広げる） */}
-          <div className="min-h-0 overflow-hidden rounded-3xl bg-white/60 p-4 ring-1 ring-black/5">
-            <div className="flex h-full min-h-0 flex-col overflow-hidden">
-              <div className="text-[11px] font-bold text-zinc-600">コメント</div>
-              <div className="mt-2 line-clamp-8 break-words text-[15px] font-semibold leading-6 text-zinc-900">
-                {comment}
-              </div>
-
-              {hasAnyThumb ? (
-                <div className="mt-auto pt-4">
-                  <div className="flex gap-3">
-                    {thumbs.map((t) => (
-                      <ImageBox key={t.label} label={t.label} dataUrl={t.dataUrl} />
-                    ))}
-                  </div>
+          {/* Row 3: コメント（画像は別ブロックで下に配置） */}
+          <div className="min-h-0 flex flex-col gap-3">
+            <div className="min-h-0 flex-1 overflow-hidden rounded-3xl bg-white/60 p-4 ring-1 ring-black/5">
+              <div className="flex h-full min-h-0 flex-col overflow-hidden">
+                <div className="text-[11px] font-bold text-zinc-600">コメント</div>
+                <div className="mt-2 min-h-0 flex-1 line-clamp-8 break-words text-[15px] font-semibold leading-6 text-zinc-900">
+                  {comment}
                 </div>
-              ) : null}
+              </div>
             </div>
+
+            {hasAnyThumb ? (
+              <div className="flex gap-3">
+                {thumbs.map((t) => (
+                  <ImageBox key={t.label} label={t.label} dataUrl={t.dataUrl} />
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
 

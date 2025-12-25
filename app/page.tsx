@@ -142,7 +142,7 @@ export default function Home() {
           </div>
 
           <div className="min-w-0">
-            <div className="sticky top-6 space-y-3">
+            <div className="space-y-3">
               <div
                 className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5"
               >
@@ -156,7 +156,7 @@ export default function Home() {
                 >
                   <div className="w-full">
                     <div
-                      className="relative mx-auto overflow-hidden"
+                      className="relative mx-auto overflow-visible"
                       style={{
                         width: previewWidth,
                         height: previewHeight,
