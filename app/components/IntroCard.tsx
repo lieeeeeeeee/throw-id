@@ -18,7 +18,7 @@ function experienceLabel(text?: string): string {
 
 function badge(text: string, tone: "dark" | "light" = "light") {
   const base =
-    "inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold tracking-tight";
+    "inline-flex items-center rounded-full px-4 py-1.5 text-[13px] font-semibold tracking-tight";
   if (tone === "dark") {
     return (
       <span className={`${base} bg-zinc-900 text-white/95`}>{text}</span>
@@ -127,7 +127,7 @@ export function IntroCard({ data }: { data: CardDraft }) {
       <div className="relative flex h-full min-h-0 flex-col box-border px-[28px] py-[26px]">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <div className="h-[92px] w-[92px] overflow-hidden rounded-[26px] bg-white/70 ring-1 ring-black/5">
+          <div className="h-[108px] w-[108px] overflow-hidden rounded-[30px] bg-white/70 ring-1 ring-black/5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={iconSrc}
@@ -162,7 +162,7 @@ export function IntroCard({ data }: { data: CardDraft }) {
           className="mt-5 grid min-h-0 flex-1 gap-4"
           style={{
             gridTemplateRows:
-              "minmax(132px, auto) minmax(132px, auto) minmax(0, 1fr)",
+              "minmax(140px, 1.1fr) minmax(140px, 1.1fr) minmax(160px, 0.8fr)",
           }}
         >
           {/* Row 1: プレイスタイル / 好きなゲーム（高さ・位置を揃える） */}
