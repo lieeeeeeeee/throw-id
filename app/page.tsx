@@ -82,6 +82,7 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                aria-label="リセット"
                 onClick={() => {
                   setDraft({
                     displayName: "",
@@ -89,12 +90,26 @@ export default function Home() {
                   });
                   setExportError(null);
                 }}
-                className="rounded-xl bg-white px-4 py-2 text-sm font-extrabold text-zinc-800 ring-1 ring-black/10 hover:bg-zinc-50"
+                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-extrabold text-zinc-800 ring-1 ring-black/10 hover:bg-zinc-50"
               >
-                リセット
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 12a9 9 0 1 0 3-6.7" />
+                  <path d="M3 4v6h6" />
+                </svg>
+                <span className="hidden sm:inline">リセット</span>
               </button>
               <button
                 type="button"
+                aria-label="ダウンロード"
                 disabled={!canExport}
                 onClick={async () => {
                   const res = cardExportSchema.safeParse(draft);
@@ -116,11 +131,25 @@ export default function Home() {
                   });
                 }}
                 className={[
-                  "rounded-xl px-4 py-2 text-sm font-extrabold text-white",
+                  "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white",
                   canExport ? "bg-zinc-900 hover:bg-zinc-800" : "bg-zinc-400",
                 ].join(" ")}
               >
-                PNGをダウンロード
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 3v12" />
+                  <path d="M7 10l5 5 5-5" />
+                  <path d="M4 21h16" />
+                </svg>
+                <span className="hidden sm:inline">ダウンロード</span>
               </button>
             </div>
           </div>

@@ -127,7 +127,7 @@ export function IntroCard({ data }: { data: CardDraft }) {
       <div className="relative flex h-full min-h-0 flex-col box-border px-[28px] py-[26px]">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <div className="h-[108px] w-[108px] overflow-hidden rounded-[30px] bg-white/70 ring-1 ring-black/5">
+          <div className="h-[118px] w-[118px] overflow-hidden rounded-[32px] bg-white/70 ring-1 ring-black/5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={iconSrc}
@@ -140,7 +140,7 @@ export function IntroCard({ data }: { data: CardDraft }) {
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <div className="truncate text-[28px] font-extrabold tracking-tight text-zinc-900">
+                <div className="truncate text-[32px] font-extrabold tracking-tight text-zinc-900">
                   {data.displayName?.trim() || "なまえ"}
                 </div>
                 <div className="mt-1 flex flex-wrap gap-2">
@@ -162,12 +162,12 @@ export function IntroCard({ data }: { data: CardDraft }) {
           className="mt-5 grid min-h-0 flex-1 gap-4"
           style={{
             gridTemplateRows:
-              "minmax(140px, 1.1fr) minmax(140px, 1.1fr) minmax(160px, 0.8fr)",
+              "minmax(60px, 0.5fr) minmax(70px, 0.6fr) minmax(160px, 0.8fr)",
           }}
         >
           {/* Row 1: プレイスタイル / 好きなゲーム（高さ・位置を揃える） */}
-          <div className="grid min-h-[132px] grid-cols-2 gap-4">
-            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-4 ring-1 ring-black/5 box-border">
+          <div className="grid min-h-[60px] grid-cols-2 gap-4">
+            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-3 ring-1 ring-black/5 box-border">
               <div className="text-[11px] font-bold text-zinc-600">
                 プレイスタイル
               </div>
@@ -175,7 +175,7 @@ export function IntroCard({ data }: { data: CardDraft }) {
                 {playStyle ? <Chip text={playStyle} /> : <Chip text="未設定" muted />}
               </div>
             </div>
-            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-4 ring-1 ring-black/5 box-border">
+            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-3 ring-1 ring-black/5 box-border">
               <div className="text-[11px] font-bold text-zinc-600">
                 好きなゲーム
               </div>
@@ -190,23 +190,28 @@ export function IntroCard({ data }: { data: CardDraft }) {
           </div>
 
           {/* Row 2: 好きな選手 と（バレル/得意ナンバー）を上下揃え */}
-          <div className="grid min-h-[132px] grid-cols-2 gap-4">
-            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-4 ring-1 ring-black/5 box-border">
+          <div className="grid min-h-[70px] grid-cols-2 gap-4">
+            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-3 ring-1 ring-black/5 box-border">
               <div className="text-[11px] font-bold text-zinc-600">好きな選手</div>
               <div className="mt-2">
-                <div className="line-clamp-3 text-[14px] font-semibold text-zinc-900">
-                  {favPlayers.join(" / ")}
-                </div>
+                <ul className="space-y-1 text-[14px] font-semibold text-zinc-900">
+                  {favPlayers.map((player, idx) => (
+                    <li key={`${player}-${idx}`} className="flex items-start gap-1">
+                      <span aria-hidden="true">・</span>
+                      <span className="line-clamp-1">{player}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
-            <div className="grid h-full grid-rows-2 gap-3">
-              <div className="overflow-hidden rounded-3xl bg-white/55 p-4 ring-1 ring-black/5 box-border">
+            <div className="grid h-full grid-rows-2 gap-2">
+              <div className="overflow-hidden rounded-3xl bg-white/55 p-3 ring-1 ring-black/5 box-border">
                 <div className="text-[11px] font-bold text-zinc-600">バレル</div>
                 <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
                   {data.barrel?.trim() || "--"}
                 </div>
               </div>
-              <div className="overflow-hidden rounded-3xl bg-white/55 p-4 ring-1 ring-black/5 box-border">
+              <div className="overflow-hidden rounded-3xl bg-white/55 p-3 ring-1 ring-black/5 box-border">
                 <div className="text-[11px] font-bold text-zinc-600">得意ナンバー</div>
                 <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
                   {bestNums}
