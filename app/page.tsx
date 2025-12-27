@@ -113,7 +113,7 @@ export default function Home() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="font-display text-2xl tracking-[0.18em] text-zinc-900">
-                Thowo ID
+                Throw ID
               </div>
             </div>
             <div className="flex items-center gap-2">
