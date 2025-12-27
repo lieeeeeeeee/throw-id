@@ -18,9 +18,15 @@ function experienceLabel(text?: string): string {
   return `歴: ${t}`;
 }
 
-function badge(text: string, tone: "dark" | "light" = "light") {
-  const base =
-    "inline-flex items-center rounded-full px-4 py-1.5 text-[13px] font-semibold tracking-tight shadow-[0_0_12px_rgba(0,0,0,0.18)]";
+function badge(
+  text: string,
+  tone: "dark" | "light" = "light",
+  shadowClass = "",
+) {
+  const base = [
+    "inline-flex items-center rounded-full px-4 py-1.5 text-[13px] font-semibold tracking-tight",
+    shadowClass,
+  ].join(" ");
   if (tone === "dark") {
     return (
       <span className={`${base} bg-zinc-900 text-white/95`}>{text}</span>
@@ -33,14 +39,23 @@ function badge(text: string, tone: "dark" | "light" = "light") {
   );
 }
 
-function Chip({ text, muted }: { text: string; muted?: boolean }) {
+function Chip({
+  text,
+  muted,
+  shadowClass = "",
+}: {
+  text: string;
+  muted?: boolean;
+  shadowClass?: string;
+}) {
   return (
     <span
       className={[
         "inline-flex items-center rounded-full px-3 py-1 text-[12px] font-medium",
         muted
-          ? "bg-white text-zinc-600 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)]"
-          : "bg-white text-zinc-900 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)]",
+          ? "bg-white text-zinc-600 ring-1 ring-black/5"
+          : "bg-white text-zinc-900 ring-1 ring-black/5",
+        shadowClass,
       ].join(" ")}
     >
       {text}
@@ -76,13 +91,20 @@ function splitTags(text?: string): string[] {
 function ImageBox({
   label,
   dataUrl,
+  shadowClass = "",
 }: {
   label: string;
   dataUrl: string;
+  shadowClass?: string;
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <div className="h-[120px] w-[170px] overflow-hidden rounded-2xl bg-white p-2 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)]">
+      <div
+        className={[
+          "h-[120px] w-[170px] overflow-hidden rounded-2xl bg-white p-2 ring-1 ring-black/5",
+          shadowClass,
+        ].join(" ")}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={dataUrl}
@@ -99,15 +121,21 @@ function ImageBox({
 export function IntroCard({
   data,
   compact = false,
+  renderMode = "preview",
 }: {
   data: CardDraft;
   compact?: boolean;
+  renderMode?: "preview" | "export";
 }) {
   const iconSrc = data.iconDataUrl ?? ICON_PLACEHOLDER;
   const backgroundStyle = getCardBackgroundStyle(data.background ?? "white");
   const hasPatternBackground = (data.background ?? "white") !== "white";
   const fontStyle = data.fontStyle ?? "normal";
   const fontClass = cardFontClassMap[fontStyle];
+  const isExport = renderMode === "export";
+  const glowShadow = isExport
+    ? "shadow-[0_6px_16px_rgba(0,0,0,0.16)]"
+    : "shadow-[0_0_12px_rgba(0,0,0,0.18)]";
 
   const playStyleTags = splitTags(data.playStyle);
   const favoriteGameTags = splitTags(data.favoriteGame);
@@ -133,10 +161,12 @@ export function IntroCard({
       style={{
         width: CARD_WIDTH,
         height: compact ? "auto" : CARD_HEIGHT,
-        backgroundColor: "#ffffff",
+        ...(isExport && hasPatternBackground
+          ? { backgroundColor: "transparent" }
+          : backgroundStyle),
       }}
     >
-      {hasPatternBackground ? (
+      {hasPatternBackground && !isExport ? (
         <div
           aria-hidden="true"
           className="absolute inset-0"
@@ -152,7 +182,12 @@ export function IntroCard({
       <div className="relative z-10 flex h-full min-h-0 flex-col box-border px-[28px] py-[26px]">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <div className="h-[118px] w-[118px] overflow-hidden rounded-[32px] bg-white ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)]">
+          <div
+            className={[
+              "h-[118px] w-[118px] overflow-hidden rounded-[32px] bg-white ring-1 ring-black/5",
+              glowShadow,
+            ].join(" ")}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={iconSrc}
@@ -165,21 +200,26 @@ export function IntroCard({
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="flex w-full items-center justify-between gap-3">
               <div className="min-w-0 w-full">
-                <div className="w-full rounded-full bg-white px-4 py-1.5 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)]">
+                <div
+                  className={[
+                    "w-full rounded-full bg-white px-4 py-1.5 ring-1 ring-black/5",
+                    glowShadow,
+                  ].join(" ")}
+                >
                   <div className="truncate text-[32px] font-extrabold tracking-tight text-zinc-900">
                     {data.displayName?.trim() || "なまえ"}
                   </div>
                 </div>
                 <div className="mt-1 flex flex-wrap gap-2">
-                  {badge(ratingLabel(data.rating), "dark")}
-                  {badge(experienceLabel(data.dartsExperience))}
+                  {badge(ratingLabel(data.rating), "dark", glowShadow)}
+                  {badge(experienceLabel(data.dartsExperience), "light", glowShadow)}
                 </div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              {badge(genderOrPlaceholder(data.gender))}
-              {badge(ageOrPlaceholder(data))}
-              {badge(textOrPlaceholder("エリア", data.area))}
+              {badge(genderOrPlaceholder(data.gender), "light", glowShadow)}
+              {badge(ageOrPlaceholder(data), "light", glowShadow)}
+              {badge(textOrPlaceholder("エリア", data.area), "light", glowShadow)}
             </div>
           </div>
         </div>
@@ -187,31 +227,41 @@ export function IntroCard({
         {compact ? (
           <div className="mt-5">
             <div className="grid min-h-[60px] grid-cols-2 gap-4">
-              <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+              <div
+                className={[
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                  glowShadow,
+                ].join(" ")}
+              >
                 <div className="text-[11px] font-bold text-zinc-600">
                   プレイスタイル
                 </div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {playStyleTags.length ? (
                     playStyleTags.map((tag, idx) => (
-                      <Chip key={`${tag}-${idx}`} text={tag} />
+                      <Chip key={`${tag}-${idx}`} text={tag} shadowClass={glowShadow} />
                     ))
                   ) : (
-                    <Chip text="未設定" muted />
+                    <Chip text="未設定" muted shadowClass={glowShadow} />
                   )}
                 </div>
               </div>
-              <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+              <div
+                className={[
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                  glowShadow,
+                ].join(" ")}
+              >
                 <div className="text-[11px] font-bold text-zinc-600">
                   好きなゲーム
                 </div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {favoriteGameTags.length ? (
                     favoriteGameTags.map((tag, idx) => (
-                      <Chip key={`${tag}-${idx}`} text={tag} />
+                      <Chip key={`${tag}-${idx}`} text={tag} shadowClass={glowShadow} />
                     ))
                   ) : (
-                    <Chip text="未設定" muted />
+                    <Chip text="未設定" muted shadowClass={glowShadow} />
                   )}
                 </div>
               </div>
@@ -227,31 +277,41 @@ export function IntroCard({
           >
             {/* Row 1: プレイスタイル / 好きなゲーム（高さ・位置を揃える） */}
             <div className="grid min-h-[60px] grid-cols-2 gap-4">
-              <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+              <div
+                className={[
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                  glowShadow,
+                ].join(" ")}
+              >
                 <div className="text-[11px] font-bold text-zinc-600">
                   プレイスタイル
                 </div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {playStyleTags.length ? (
                     playStyleTags.map((tag, idx) => (
-                      <Chip key={`${tag}-${idx}`} text={tag} />
+                      <Chip key={`${tag}-${idx}`} text={tag} shadowClass={glowShadow} />
                     ))
                   ) : (
-                    <Chip text="未設定" muted />
+                    <Chip text="未設定" muted shadowClass={glowShadow} />
                   )}
                 </div>
               </div>
-              <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+              <div
+                className={[
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                  glowShadow,
+                ].join(" ")}
+              >
                 <div className="text-[11px] font-bold text-zinc-600">
                   好きなゲーム
                 </div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {favoriteGameTags.length ? (
                     favoriteGameTags.map((tag, idx) => (
-                      <Chip key={`${tag}-${idx}`} text={tag} />
+                      <Chip key={`${tag}-${idx}`} text={tag} shadowClass={glowShadow} />
                     ))
                   ) : (
-                    <Chip text="未設定" muted />
+                    <Chip text="未設定" muted shadowClass={glowShadow} />
                   )}
                 </div>
               </div>
@@ -259,7 +319,12 @@ export function IntroCard({
 
             {/* Row 2: 好きな選手 と（バレル/得意ナンバー）を上下揃え */}
             <div className="grid min-h-[70px] grid-cols-2 gap-4">
-              <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+              <div
+                className={[
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                  glowShadow,
+                ].join(" ")}
+              >
                 <div className="text-[11px] font-bold text-zinc-600">好きな選手</div>
                 <div className="mt-2">
                   <ul className="space-y-1 text-[14px] font-semibold text-zinc-900">
@@ -273,13 +338,23 @@ export function IntroCard({
                 </div>
               </div>
               <div className="grid h-full grid-rows-2 gap-2">
-                <div className="overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+                <div
+                  className={[
+                    "overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                    glowShadow,
+                  ].join(" ")}
+                >
                   <div className="text-[11px] font-bold text-zinc-600">バレル</div>
                   <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
                     {data.barrel?.trim() || "--"}
                   </div>
                 </div>
-                <div className="overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+                <div
+                  className={[
+                    "overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                    glowShadow,
+                  ].join(" ")}
+                >
                   <div className="text-[11px] font-bold text-zinc-600">得意ナンバー</div>
                   <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
                     {bestNums}
@@ -290,7 +365,12 @@ export function IntroCard({
 
             {/* Row 3: コメント（画像は別ブロックで下に配置） */}
             <div className="min-h-0 flex flex-col gap-3">
-              <div className="min-h-0 flex-1 overflow-hidden rounded-3xl bg-white p-4 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)]">
+              <div
+                className={[
+                  "min-h-0 flex-1 overflow-hidden rounded-3xl bg-white p-4 ring-1 ring-black/5",
+                  glowShadow,
+                ].join(" ")}
+              >
                 <div className="flex h-full min-h-0 flex-col overflow-hidden">
                   <div className="text-[11px] font-bold text-zinc-600">コメント</div>
                   <div className="mt-2 min-h-0 flex-1 line-clamp-8 break-words text-[15px] font-semibold leading-6 text-zinc-900">
@@ -302,7 +382,12 @@ export function IntroCard({
               {hasAnyThumb ? (
                 <div className="flex gap-3">
                   {thumbs.map((t) => (
-                    <ImageBox key={t.label} label={t.label} dataUrl={t.dataUrl} />
+                    <ImageBox
+                      key={t.label}
+                      label={t.label}
+                      dataUrl={t.dataUrl}
+                      shadowClass={glowShadow}
+                    />
                   ))}
                 </div>
               ) : null}

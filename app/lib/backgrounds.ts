@@ -37,6 +37,11 @@ export function getCardBackgroundStyle(background: CardBackground): CSSPropertie
   };
 }
 
+export function getCardBackgroundImageSrc(background: CardBackground): string | null {
+  if (background === "white") return null;
+  return BACKGROUND_IMAGE_MAP[background].src;
+}
+
 export const CARD_BACKGROUND_OPTIONS: CardBackgroundOption[] = [
   {
     id: "white",

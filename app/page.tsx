@@ -4,6 +4,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CardForm } from "./components/CardForm";
 import { IntroCard } from "./components/IntroCard";
 import { exportElementPng615x870 } from "./lib/exportPng";
+import { getCardBackgroundImageSrc } from "./lib/backgrounds";
 import {
   CARD_HEIGHT,
   CARD_WIDTH,
@@ -105,6 +106,11 @@ export default function Home() {
       filename,
       width: CARD_WIDTH,
       height: cardHeight,
+      background: {
+        color: "#ffffff",
+        imageSrc: getCardBackgroundImageSrc(draft.background ?? "white"),
+        blurPx: 3,
+      },
     });
   };
 
@@ -218,7 +224,7 @@ export default function Home() {
                           height: cardHeight,
                         }}
                       >
-                        <IntroCard data={draft} compact={isCompact} />
+                        <IntroCard data={draft} compact={isCompact} renderMode="preview" />
                       </div>
                     </div>
                   </div>
@@ -258,7 +264,7 @@ export default function Home() {
                 aria-hidden="true"
               >
                 <div ref={exportRef}>
-                  <IntroCard data={draft} compact={isCompact} />
+                  <IntroCard data={draft} compact={isCompact} renderMode="export" />
                 </div>
               </div>
             </div>

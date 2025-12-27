@@ -20,21 +20,57 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+function drawCover(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  width: number,
+  height: number,
+  scale = 1,
+) {
+  const imgRatio = img.width / img.height;
+  const canvasRatio = width / height;
+
+  let drawWidth = width;
+  let drawHeight = height;
+
+  if (imgRatio > canvasRatio) {
+    drawHeight = height;
+    drawWidth = height * imgRatio;
+  } else {
+    drawWidth = width;
+    drawHeight = width / imgRatio;
+  }
+
+  drawWidth *= scale;
+  drawHeight *= scale;
+
+  const dx = (width - drawWidth) / 2;
+  const dy = (height - drawHeight) / 2;
+  ctx.drawImage(img, dx, dy, drawWidth, drawHeight);
+}
+
 export async function exportElementPng615x870({
   element,
   filename,
   width,
   height,
+  background,
 }: {
   element: HTMLElement;
   filename: string;
   width: number;
   height: number;
+  background?: {
+    color?: string;
+    imageSrc?: string | null;
+    blurPx?: number;
+  };
 }) {
   // いったん高解像度でレンダ→最終的に指定サイズへダウンスケール
   const rawDataUrl = await toPng(element, {
     cacheBust: true,
     pixelRatio: 2,
+    backgroundColor: "transparent",
   });
 
   const img = await loadImage(rawDataUrl);
@@ -49,6 +85,19 @@ export async function exportElementPng615x870({
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   ctx.clearRect(0, 0, width, height);
+
+  if (background?.color) {
+    ctx.fillStyle = background.color;
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  if (background?.imageSrc) {
+    const bg = await loadImage(background.imageSrc);
+    ctx.filter = background.blurPx ? `blur(${background.blurPx}px)` : "none";
+    drawCover(ctx, bg, width, height, 1.06);
+    ctx.filter = "none";
+  }
+
   ctx.drawImage(img, 0, 0, width, height);
 
   const blob = await new Promise<Blob>((resolve, reject) => {
