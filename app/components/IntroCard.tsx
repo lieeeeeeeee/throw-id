@@ -90,6 +90,7 @@ function ImageBox({
 export function IntroCard({ data }: { data: CardDraft }) {
   const iconSrc = data.iconDataUrl ?? ICON_PLACEHOLDER;
   const backgroundStyle = getCardBackgroundStyle(data.background ?? "white");
+  const hasPatternBackground = (data.background ?? "white") !== "white";
 
   const playStyle = data.playStyle?.trim();
   const favoriteGame = data.favoriteGame?.trim();
@@ -115,10 +116,23 @@ export function IntroCard({ data }: { data: CardDraft }) {
       style={{
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
-        ...backgroundStyle,
+        backgroundColor: "#ffffff",
       }}
     >
-      <div className="relative flex h-full min-h-0 flex-col box-border px-[28px] py-[26px]">
+      {hasPatternBackground ? (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            ...backgroundStyle,
+            filter: "blur(3px)",
+            transform: "scale(1.05)",
+            transformOrigin: "center",
+          }}
+        />
+      ) : null}
+
+      <div className="relative z-10 flex h-full min-h-0 flex-col box-border px-[28px] py-[26px]">
         {/* Header */}
         <div className="flex items-center gap-4">
           <div className="h-[118px] w-[118px] overflow-hidden rounded-[32px] bg-white ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)]">
