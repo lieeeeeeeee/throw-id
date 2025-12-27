@@ -10,6 +10,7 @@ import {
   type CardDraft,
   cardExportSchema,
 } from "./lib/schema";
+import { hasDetailedSettings } from "./lib/cardLayout";
 
 function fileSafe(name: string) {
   return name
@@ -46,8 +47,11 @@ export default function Home() {
   const previewWrapRef = useRef<HTMLDivElement | null>(null);
   const [previewScale, setPreviewScale] = useState(1);
   const previewInset = 16;
+  const [cardHeight, setCardHeight] = useState(CARD_HEIGHT);
 
   const canExport = useMemo(() => cardExportSchema.safeParse(draft).success, [draft]);
+  const hasDetails = useMemo(() => hasDetailedSettings(draft), [draft]);
+  const isCompact = !hasDetails;
 
   useLayoutEffect(() => {
     const el = previewWrapRef.current;
@@ -65,13 +69,22 @@ export default function Home() {
     return () => ro.disconnect();
   }, [previewInset]);
 
+  useLayoutEffect(() => {
+    const el = exportRef.current;
+    if (!el) return;
+    const nextHeight = Math.round(el.getBoundingClientRect().height || CARD_HEIGHT);
+    if (nextHeight > 0 && nextHeight !== cardHeight) {
+      setCardHeight(nextHeight);
+    }
+  }, [draft, isCompact, cardHeight]);
+
   const previewWidth = CARD_WIDTH * previewScale;
-  const previewHeight = CARD_HEIGHT * previewScale;
+  const previewHeight = cardHeight * previewScale;
 
   const filename = useMemo(() => {
     const base = draft.displayName?.trim().length ? draft.displayName.trim() : "darts_card";
-    return `${fileSafe(base)}_615x870.png`;
-  }, [draft.displayName]);
+    return `${fileSafe(base)}_${CARD_WIDTH}x${cardHeight}.png`;
+  }, [draft.displayName, cardHeight]);
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -133,7 +146,7 @@ export default function Home() {
                     element: exportRef.current,
                     filename,
                     width: CARD_WIDTH,
-                    height: CARD_HEIGHT,
+                    height: cardHeight,
                   });
                 }}
                 className={[
@@ -203,10 +216,10 @@ export default function Home() {
                           transform: `scale(${previewScale})`,
                           transformOrigin: "top left",
                           width: CARD_WIDTH,
-                          height: CARD_HEIGHT,
+                          height: cardHeight,
                         }}
                       >
-                        <IntroCard data={draft} />
+                        <IntroCard data={draft} compact={isCompact} />
                       </div>
                     </div>
                   </div>
@@ -219,7 +232,7 @@ export default function Home() {
                 aria-hidden="true"
               >
                 <div ref={exportRef}>
-                  <IntroCard data={draft} />
+                  <IntroCard data={draft} compact={isCompact} />
                 </div>
               </div>
             </div>

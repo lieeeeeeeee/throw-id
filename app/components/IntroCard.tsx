@@ -96,7 +96,13 @@ function ImageBox({
   );
 }
 
-export function IntroCard({ data }: { data: CardDraft }) {
+export function IntroCard({
+  data,
+  compact = false,
+}: {
+  data: CardDraft;
+  compact?: boolean;
+}) {
   const iconSrc = data.iconDataUrl ?? ICON_PLACEHOLDER;
   const backgroundStyle = getCardBackgroundStyle(data.background ?? "white");
   const hasPatternBackground = (data.background ?? "white") !== "white";
@@ -126,7 +132,7 @@ export function IntroCard({ data }: { data: CardDraft }) {
       className={`relative overflow-hidden rounded-[28px] shadow-[0_18px_48px_rgba(0,0,0,0.12)] ring-1 ring-black/5 ${fontClass}`}
       style={{
         width: CARD_WIDTH,
-        height: CARD_HEIGHT,
+        height: compact ? "auto" : CARD_HEIGHT,
         backgroundColor: "#ffffff",
       }}
     >
@@ -178,97 +184,131 @@ export function IntroCard({ data }: { data: CardDraft }) {
           </div>
         </div>
 
-        {/* Rows (行単位で高さを揃え、コメントは下端まで伸ばす) */}
-        <div
-          className="mt-5 grid min-h-0 flex-1 gap-4"
-          style={{
-            gridTemplateRows:
-              "minmax(60px, 0.5fr) minmax(70px, 0.6fr) minmax(160px, 0.8fr)",
-          }}
-        >
-          {/* Row 1: プレイスタイル / 好きなゲーム（高さ・位置を揃える） */}
-          <div className="grid min-h-[60px] grid-cols-2 gap-4">
-            <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
-              <div className="text-[11px] font-bold text-zinc-600">
-                プレイスタイル
+        {compact ? (
+          <div className="mt-5">
+            <div className="grid min-h-[60px] grid-cols-2 gap-4">
+              <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+                <div className="text-[11px] font-bold text-zinc-600">
+                  プレイスタイル
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {playStyleTags.length ? (
+                    playStyleTags.map((tag, idx) => (
+                      <Chip key={`${tag}-${idx}`} text={tag} />
+                    ))
+                  ) : (
+                    <Chip text="未設定" muted />
+                  )}
+                </div>
               </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {playStyleTags.length ? (
-                  playStyleTags.map((tag, idx) => (
-                    <Chip key={`${tag}-${idx}`} text={tag} />
-                  ))
-                ) : (
-                  <Chip text="未設定" muted />
-                )}
-              </div>
-            </div>
-            <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
-              <div className="text-[11px] font-bold text-zinc-600">
-                好きなゲーム
-              </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {favoriteGameTags.length ? (
-                  favoriteGameTags.map((tag, idx) => (
-                    <Chip key={`${tag}-${idx}`} text={tag} />
-                  ))
-                ) : (
-                  <Chip text="未設定" muted />
-                )}
+              <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+                <div className="text-[11px] font-bold text-zinc-600">
+                  好きなゲーム
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {favoriteGameTags.length ? (
+                    favoriteGameTags.map((tag, idx) => (
+                      <Chip key={`${tag}-${idx}`} text={tag} />
+                    ))
+                  ) : (
+                    <Chip text="未設定" muted />
+                  )}
+                </div>
               </div>
             </div>
           </div>
+        ) : (
+          <div
+            className="mt-5 grid min-h-0 flex-1 gap-4"
+            style={{
+              gridTemplateRows:
+                "minmax(60px, 0.5fr) minmax(70px, 0.6fr) minmax(160px, 0.8fr)",
+            }}
+          >
+            {/* Row 1: プレイスタイル / 好きなゲーム（高さ・位置を揃える） */}
+            <div className="grid min-h-[60px] grid-cols-2 gap-4">
+              <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+                <div className="text-[11px] font-bold text-zinc-600">
+                  プレイスタイル
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {playStyleTags.length ? (
+                    playStyleTags.map((tag, idx) => (
+                      <Chip key={`${tag}-${idx}`} text={tag} />
+                    ))
+                  ) : (
+                    <Chip text="未設定" muted />
+                  )}
+                </div>
+              </div>
+              <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+                <div className="text-[11px] font-bold text-zinc-600">
+                  好きなゲーム
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {favoriteGameTags.length ? (
+                    favoriteGameTags.map((tag, idx) => (
+                      <Chip key={`${tag}-${idx}`} text={tag} />
+                    ))
+                  ) : (
+                    <Chip text="未設定" muted />
+                  )}
+                </div>
+              </div>
+            </div>
 
-          {/* Row 2: 好きな選手 と（バレル/得意ナンバー）を上下揃え */}
-          <div className="grid min-h-[70px] grid-cols-2 gap-4">
-            <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
-              <div className="text-[11px] font-bold text-zinc-600">好きな選手</div>
-              <div className="mt-2">
-                <ul className="space-y-1 text-[14px] font-semibold text-zinc-900">
-                  {favPlayers.map((player, idx) => (
-                    <li key={`${player}-${idx}`} className="flex items-start gap-1">
-                      <span aria-hidden="true">・</span>
-                      <span className="line-clamp-1">{player}</span>
-                    </li>
+            {/* Row 2: 好きな選手 と（バレル/得意ナンバー）を上下揃え */}
+            <div className="grid min-h-[70px] grid-cols-2 gap-4">
+              <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+                <div className="text-[11px] font-bold text-zinc-600">好きな選手</div>
+                <div className="mt-2">
+                  <ul className="space-y-1 text-[14px] font-semibold text-zinc-900">
+                    {favPlayers.map((player, idx) => (
+                      <li key={`${player}-${idx}`} className="flex items-start gap-1">
+                        <span aria-hidden="true">・</span>
+                        <span className="line-clamp-1">{player}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <div className="grid h-full grid-rows-2 gap-2">
+                <div className="overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+                  <div className="text-[11px] font-bold text-zinc-600">バレル</div>
+                  <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
+                    {data.barrel?.trim() || "--"}
+                  </div>
+                </div>
+                <div className="overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
+                  <div className="text-[11px] font-bold text-zinc-600">得意ナンバー</div>
+                  <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
+                    {bestNums}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 3: コメント（画像は別ブロックで下に配置） */}
+            <div className="min-h-0 flex flex-col gap-3">
+              <div className="min-h-0 flex-1 overflow-hidden rounded-3xl bg-white p-4 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)]">
+                <div className="flex h-full min-h-0 flex-col overflow-hidden">
+                  <div className="text-[11px] font-bold text-zinc-600">コメント</div>
+                  <div className="mt-2 min-h-0 flex-1 line-clamp-8 break-words text-[15px] font-semibold leading-6 text-zinc-900">
+                    {comment}
+                  </div>
+                </div>
+              </div>
+
+              {hasAnyThumb ? (
+                <div className="flex gap-3">
+                  {thumbs.map((t) => (
+                    <ImageBox key={t.label} label={t.label} dataUrl={t.dataUrl} />
                   ))}
-                </ul>
-              </div>
-            </div>
-            <div className="grid h-full grid-rows-2 gap-2">
-              <div className="overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
-                <div className="text-[11px] font-bold text-zinc-600">バレル</div>
-                <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
-                  {data.barrel?.trim() || "--"}
                 </div>
-              </div>
-              <div className="overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
-                <div className="text-[11px] font-bold text-zinc-600">得意ナンバー</div>
-                <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
-                  {bestNums}
-                </div>
-              </div>
+              ) : null}
             </div>
           </div>
-
-          {/* Row 3: コメント（画像は別ブロックで下に配置） */}
-          <div className="min-h-0 flex flex-col gap-3">
-            <div className="min-h-0 flex-1 overflow-hidden rounded-3xl bg-white p-4 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)]">
-              <div className="flex h-full min-h-0 flex-col overflow-hidden">
-                <div className="text-[11px] font-bold text-zinc-600">コメント</div>
-                <div className="mt-2 min-h-0 flex-1 line-clamp-8 break-words text-[15px] font-semibold leading-6 text-zinc-900">
-                  {comment}
-                </div>
-              </div>
-            </div>
-
-            {hasAnyThumb ? (
-              <div className="flex gap-3">
-                {thumbs.map((t) => (
-                  <ImageBox key={t.label} label={t.label} dataUrl={t.dataUrl} />
-                ))}
-              </div>
-            ) : null}
-          </div>
-        </div>
+        )}
 
       </div>
     </div>
