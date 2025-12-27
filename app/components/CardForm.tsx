@@ -50,11 +50,15 @@ function TextInput({
   onChange,
   placeholder,
   maxLength,
+  className,
+  dataField,
 }: {
   value?: string;
   onChange: (v: string) => void;
   placeholder?: string;
   maxLength?: number;
+  className?: string;
+  dataField?: string;
 }) {
   return (
     <input
@@ -62,7 +66,11 @@ function TextInput({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       maxLength={maxLength}
-      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm font-medium text-zinc-900 outline-none focus:border-black/20 focus:ring-4 focus:ring-black/5"
+      data-field={dataField}
+      className={[
+        "w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm font-medium text-zinc-900 outline-none focus:border-black/20 focus:ring-4 focus:ring-black/5",
+        className ?? "",
+      ].join(" ")}
     />
   );
 }
@@ -252,13 +260,20 @@ function ImageInput({
 export function CardForm({
   data,
   onPatch,
+  showValidation = false,
 }: {
   data: CardDraft;
   onPatch: (patch: Partial<CardDraft>) => void;
+  showValidation?: boolean;
 }) {
   const gender = data.gender ?? "";
   const background = data.background ?? "white";
   const fontStyle = data.fontStyle ?? "normal";
+  const missingName = showValidation && !data.displayName?.trim();
+  const missingGender = showValidation && !data.gender;
+  const missingAge = showValidation && !data.age?.trim();
+  const errorClass =
+    "border-rose-500 focus:border-rose-500 focus:ring-4 focus:ring-rose-100";
 
   return (
     <div className="space-y-4">
@@ -270,6 +285,8 @@ export function CardForm({
             onChange={(v) => onPatch({ displayName: v })}
             maxLength={20}
             placeholder="なまえ"
+            dataField="displayName"
+            className={missingName ? errorClass : undefined}
           />
           <div className="text-right text-xs font-bold text-zinc-500">
             {(data.displayName?.length ?? 0)}/20
@@ -296,7 +313,11 @@ export function CardForm({
                         : (e.target.value as CardDraft["gender"]),
                   })
                 }
-                className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm font-semibold text-zinc-900 outline-none focus:border-black/20 focus:ring-4 focus:ring-black/5"
+                data-field="gender"
+                className={[
+                  "w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm font-semibold text-zinc-900 outline-none focus:border-black/20 focus:ring-4 focus:ring-black/5",
+                  missingGender ? errorClass : "",
+                ].join(" ")}
               >
                 <option value="">選択してください</option>
                 <option value="male">男性</option>
@@ -312,6 +333,8 @@ export function CardForm({
                 onChange={(v) => onPatch({ age: v })}
                 maxLength={10}
                 placeholder="27歳 / 20代"
+                dataField="age"
+                className={missingAge ? errorClass : undefined}
               />
               <div className="text-right text-xs font-bold text-zinc-500">
                 {(data.age?.length ?? 0)}/10

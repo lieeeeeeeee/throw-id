@@ -20,21 +20,6 @@ function fileSafe(name: string) {
     .slice(0, 40);
 }
 
-type ZodIssuePath = Array<string | number>;
-
-function formatErrors(errors: unknown): string {
-  try {
-    const zerr = errors as { issues?: Array<{ message: string; path: ZodIssuePath }> };
-    if (!zerr.issues?.length) return "入力内容を確認してください";
-    const lines = zerr.issues
-      .slice(0, 6)
-      .map((i) => `- ${i.message}${i.path?.length ? `（${i.path.join(".")}）` : ""}`);
-    return ["入力エラー:", ...lines].join("\n");
-  } catch {
-    return "入力内容を確認してください";
-  }
-}
-
 export default function Home() {
   const [draft, setDraft] = useState<CardDraft>(() => ({
     displayName: "",
@@ -42,7 +27,7 @@ export default function Home() {
     background: "white",
     fontStyle: "normal",
   }));
-  const [exportError, setExportError] = useState<string | null>(null);
+  const [showValidation, setShowValidation] = useState(false);
   const exportRef = useRef<HTMLDivElement | null>(null);
   const previewWrapRef = useRef<HTMLDivElement | null>(null);
   const [previewScale, setPreviewScale] = useState(1);
@@ -52,6 +37,14 @@ export default function Home() {
   const canExport = useMemo(() => cardExportSchema.safeParse(draft).success, [draft]);
   const hasDetails = useMemo(() => hasDetailedSettings(draft), [draft]);
   const isCompact = !hasDetails;
+  const missingFields = useMemo(
+    () => ({
+      displayName: !draft.displayName?.trim(),
+      gender: !draft.gender,
+      age: !draft.age?.trim(),
+    }),
+    [draft],
+  );
 
   useLayoutEffect(() => {
     const el = previewWrapRef.current;
@@ -89,13 +82,22 @@ export default function Home() {
   const handleDownload = async () => {
     const res = cardExportSchema.safeParse(draft);
     if (!res.success) {
-      setExportError(formatErrors(res.error));
+      setShowValidation(true);
+      const order = ["displayName", "gender", "age"] as const;
+      const nextField = order.find((key) => missingFields[key]);
+      if (nextField && typeof document !== "undefined") {
+        const el = document.querySelector<HTMLElement>(
+          `[data-field="${nextField}"]`,
+        );
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          if ("focus" in el) el.focus();
+        }
+      }
       return;
     }
-    setExportError(null);
 
     if (!exportRef.current) {
-      setExportError("カードの生成に失敗しました");
       return;
     }
     await exportElementPng615x870({
@@ -127,7 +129,7 @@ export default function Home() {
                     background: "white",
                     fontStyle: "normal",
                   });
-                  setExportError(null);
+                  setShowValidation(false);
                 }}
                 className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-extrabold text-zinc-800 ring-1 ring-black/10 hover:bg-zinc-50"
               >
@@ -149,7 +151,6 @@ export default function Home() {
               <button
                 type="button"
                 aria-label="ダウンロード"
-                disabled={!canExport}
                 onClick={handleDownload}
                 className={[
                   "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white",
@@ -174,11 +175,6 @@ export default function Home() {
               </button>
             </div>
           </div>
-          {exportError ? (
-            <pre className="mt-3 whitespace-pre-wrap rounded-2xl bg-rose-50 p-3 text-xs font-bold text-rose-900 ring-1 ring-rose-200">
-              {exportError}
-            </pre>
-          ) : null}
         </div>
       </header>
 
@@ -188,6 +184,7 @@ export default function Home() {
             <CardForm
               data={draft}
               onPatch={(patch) => setDraft((p) => ({ ...p, ...patch }))}
+              showValidation={showValidation}
             />
           </div>
 
@@ -230,7 +227,6 @@ export default function Home() {
                   <button
                     type="button"
                     aria-label="プレビューをダウンロード"
-                    disabled={!canExport}
                     onClick={handleDownload}
                     className={[
                       "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white",
