@@ -83,8 +83,8 @@ export default function Home() {
 
   const filename = useMemo(() => {
     const base = draft.displayName?.trim().length ? draft.displayName.trim() : "darts_card";
-    return `${fileSafe(base)}_${CARD_WIDTH}x${cardHeight}.png`;
-  }, [draft.displayName, cardHeight]);
+    return `throw_id_${fileSafe(base)}.png`;
+  }, [draft.displayName]);
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -237,6 +237,38 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-8">
+          <a
+            href="https://forms.gle/8hv3b6H8fYyXw1ns8"
+            target="_blank"
+            rel="noreferrer"
+            className="group inline-flex items-center gap-3 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 shadow-sm transition hover:border-black/20 hover:bg-zinc-50"
+          >
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900/5 text-zinc-700">
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h7" />
+                <path d="M14 3h7v7" />
+                <path d="M14 10 21 3" />
+              </svg>
+            </span>
+            <span>
+              このサイトのご意見フォーム
+              <span className="ml-2 text-xs font-bold text-zinc-500 group-hover:text-zinc-700">
+                フィードバックを送る
+              </span>
+            </span>
+          </a>
         </div>
       </main>
     </div>
