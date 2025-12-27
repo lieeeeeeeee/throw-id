@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Bungee, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const siteUrl =
@@ -17,6 +17,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const bungee = Bungee({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -47,7 +53,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${bungee.variable} antialiased`}
       >
         {children}
       </body>

@@ -260,51 +260,6 @@ export function CardForm({
 
   return (
     <div className="space-y-4">
-      <Section title="背景">
-        <div className="flex gap-3 overflow-x-auto overflow-y-visible px-1 py-1">
-          {CARD_BACKGROUND_OPTIONS.map((opt) => {
-            const checked = background === opt.id;
-            const previewStyle =
-              opt.id === "white"
-                ? getCardBackgroundStyle(opt.id)
-                : {
-                    ...getCardBackgroundStyle(opt.id),
-                    backgroundSize: "190%",
-                    backgroundPosition: "center",
-                  };
-            return (
-              <label
-                key={opt.id}
-                className="group block w-16 shrink-0 cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  name="background"
-                  value={opt.id}
-                  className="sr-only"
-                  checked={checked}
-                  onChange={() => onPatch({ background: opt.id })}
-                />
-                <div
-                  className={[
-                    "aspect-square w-16 overflow-hidden rounded-xl ring-1 ring-black/10 transition",
-                    checked ? "ring-2 ring-zinc-900" : "hover:ring-black/25",
-                  ].join(" ")}
-                >
-                  <div
-                    className="h-full w-full rounded-[10px]"
-                    style={previewStyle}
-                  />
-                </div>
-                <div className="mt-2 text-xs font-bold text-zinc-700">
-                  {opt.label}
-                </div>
-              </label>
-            );
-          })}
-        </div>
-      </Section>
-
       <Section title="基本">
         <div className="space-y-2">
           <RequiredLabel text="カード名" />
@@ -428,86 +383,152 @@ export function CardForm({
         </div>
       </Section>
 
-      <Section title="装備・好み">
-        <div className="space-y-2">
-          <Label text="好きな選手" />
-          <div className="grid grid-cols-3 gap-2">
-            {[0, 1, 2].map((i) => (
+      <details className="group rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
+        <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-extrabold tracking-tight text-zinc-900">
+          <span className="flex items-center gap-2">
+            <span
+              aria-hidden="true"
+              className="inline-block transition-transform duration-200 group-open:rotate-90"
+            >
+              &gt;
+            </span>
+            詳細な項目
+          </span>
+          <span className="text-xs font-bold text-zinc-500 group-open:hidden">
+            開く
+          </span>
+          <span className="text-xs font-bold text-zinc-500 hidden group-open:inline">
+            閉じる
+          </span>
+        </summary>
+        <div className="mt-4 space-y-4">
+          <Section title="背景">
+            <div className="flex gap-3 overflow-x-auto overflow-y-visible px-1 py-1">
+              {CARD_BACKGROUND_OPTIONS.map((opt) => {
+                const checked = background === opt.id;
+                const previewStyle =
+                  opt.id === "white"
+                    ? getCardBackgroundStyle(opt.id)
+                    : {
+                        ...getCardBackgroundStyle(opt.id),
+                        backgroundSize: "190%",
+                        backgroundPosition: "center",
+                      };
+                return (
+                  <label
+                    key={opt.id}
+                    className="group block w-16 shrink-0 cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="background"
+                      value={opt.id}
+                      className="sr-only"
+                      checked={checked}
+                      onChange={() => onPatch({ background: opt.id })}
+                    />
+                    <div
+                      className={[
+                        "aspect-square w-16 overflow-hidden rounded-xl ring-1 ring-black/10 transition",
+                        checked ? "ring-2 ring-zinc-900" : "hover:ring-black/25",
+                      ].join(" ")}
+                    >
+                      <div
+                        className="h-full w-full rounded-[10px]"
+                        style={previewStyle}
+                      />
+                    </div>
+                    <div className="mt-2 text-xs font-bold text-zinc-700">
+                      {opt.label}
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+          </Section>
+
+          <Section title="装備・好み">
+            <div className="space-y-2">
+              <Label text="好きな選手" />
+              <div className="grid grid-cols-3 gap-2">
+                {[0, 1, 2].map((i) => (
+                  <TextInput
+                    key={i}
+                    value={data.favoritePlayers[i] ?? ""}
+                    onChange={(v) => {
+                      const next = [...(data.favoritePlayers ?? [])];
+                      next[i] = v;
+                      onPatch({
+                        favoritePlayers: next.filter((x) => x.trim().length > 0),
+                      });
+                    }}
+                    maxLength={16}
+                    placeholder={`選手${i + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label text="バレル" />
               <TextInput
-                key={i}
-                value={data.favoritePlayers[i] ?? ""}
-                onChange={(v) => {
-                  const next = [...(data.favoritePlayers ?? [])];
-                  next[i] = v;
-                  onPatch({
-                    favoritePlayers: next.filter((x) => x.trim().length > 0),
-                  });
-                }}
-                maxLength={16}
-                placeholder={`選手${i + 1}`}
+                value={data.barrel}
+                onChange={(v) => onPatch({ barrel: v })}
+                maxLength={32}
+                placeholder="メーカー / モデル"
               />
-            ))}
-          </div>
-        </div>
+            </div>
 
-        <div className="space-y-2">
-          <Label text="バレル" />
-          <TextInput
-            value={data.barrel}
-            onChange={(v) => onPatch({ barrel: v })}
-            maxLength={32}
-            placeholder="メーカー / モデル"
-          />
-        </div>
+            <div className="space-y-2">
+              <Label text="得意ナンバー" />
+              <TextInput
+                value={data.bestNumber}
+                onChange={(v) => onPatch({ bestNumber: v })}
+                maxLength={10}
+                placeholder="20/19/18"
+              />
+              <div className="text-right text-xs font-bold text-zinc-500">
+                {(data.bestNumber?.length ?? 0)}/10
+              </div>
+            </div>
 
-        <div className="space-y-2">
-          <Label text="得意ナンバー" />
-          <TextInput
-            value={data.bestNumber}
-            onChange={(v) => onPatch({ bestNumber: v })}
-            maxLength={10}
-            placeholder="20/19/18"
-          />
-          <div className="text-right text-xs font-bold text-zinc-500">
-            {(data.bestNumber?.length ?? 0)}/10
-          </div>
-        </div>
+            <div className="space-y-2">
+              <Label text="コメント" />
+              <textarea
+                value={data.comment ?? ""}
+                onChange={(e) => onPatch({ comment: e.target.value })}
+                maxLength={80}
+                rows={3}
+                placeholder="一緒に投げましょう！"
+                className="w-full resize-none rounded-xl border border-black/10 bg-white px-3 py-2 text-sm font-semibold text-zinc-900 outline-none focus:border-black/20 focus:ring-4 focus:ring-black/5"
+              />
+              <div className="text-right text-xs font-bold text-zinc-500">
+                {(data.comment?.length ?? 0)}/80
+              </div>
+            </div>
+          </Section>
 
-        <div className="space-y-2">
-          <Label text="コメント" />
-          <textarea
-            value={data.comment ?? ""}
-            onChange={(e) => onPatch({ comment: e.target.value })}
-            maxLength={80}
-            rows={3}
-            placeholder="一緒に投げましょう！"
-            className="w-full resize-none rounded-xl border border-black/10 bg-white px-3 py-2 text-sm font-semibold text-zinc-900 outline-none focus:border-black/20 focus:ring-4 focus:ring-black/5"
-          />
-          <div className="text-right text-xs font-bold text-zinc-500">
-            {(data.comment?.length ?? 0)}/80
-          </div>
+          <Section title="画像">
+            <div className="grid grid-cols-3 gap-3">
+              <ImageInput
+                label="ライブテーマ"
+                value={data.liveThemeImageDataUrl}
+                onChange={(v) => onPatch({ liveThemeImageDataUrl: v })}
+              />
+              <ImageInput
+                label="ファンダーツ"
+                value={data.funDartsImageDataUrl}
+                onChange={(v) => onPatch({ funDartsImageDataUrl: v })}
+              />
+              <ImageInput
+                label="ダーツカード"
+                value={data.dartsCardImageDataUrl}
+                onChange={(v) => onPatch({ dartsCardImageDataUrl: v })}
+              />
+            </div>
+          </Section>
         </div>
-      </Section>
-
-      <Section title="画像">
-        <div className="grid grid-cols-3 gap-3">
-          <ImageInput
-            label="ライブテーマ"
-            value={data.liveThemeImageDataUrl}
-            onChange={(v) => onPatch({ liveThemeImageDataUrl: v })}
-          />
-          <ImageInput
-            label="ファンダーツ"
-            value={data.funDartsImageDataUrl}
-            onChange={(v) => onPatch({ funDartsImageDataUrl: v })}
-          />
-          <ImageInput
-            label="ダーツカード"
-            value={data.dartsCardImageDataUrl}
-            onChange={(v) => onPatch({ dartsCardImageDataUrl: v })}
-          />
-        </div>
-      </Section>
+      </details>
     </div>
   );
 }
