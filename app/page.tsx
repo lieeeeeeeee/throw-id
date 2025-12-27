@@ -39,6 +39,7 @@ export default function Home() {
     displayName: "",
     favoritePlayers: [],
     background: "white",
+    fontStyle: "normal",
   }));
   const [exportError, setExportError] = useState<string | null>(null);
   const exportRef = useRef<HTMLDivElement | null>(null);
@@ -91,6 +92,7 @@ export default function Home() {
                     displayName: "",
                     favoritePlayers: [],
                     background: "white",
+                    fontStyle: "normal",
                   });
                   setExportError(null);
                 }}

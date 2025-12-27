@@ -15,6 +15,9 @@ export const cardBackgroundSchema = z.enum([
 ]);
 export type CardBackground = z.infer<typeof cardBackgroundSchema>;
 
+export const cardFontSchema = z.enum(["normal", "bold", "handwritten"]);
+export type CardFontStyle = z.infer<typeof cardFontSchema>;
+
 const imageDataUrlSchema = z.string().startsWith("data:image/");
 
 export const cardDraftSchema = z.object({
@@ -22,6 +25,7 @@ export const cardDraftSchema = z.object({
   iconDataUrl: imageDataUrlSchema.optional(),
 
   background: cardBackgroundSchema.default("white"),
+  fontStyle: cardFontSchema.default("normal"),
 
   gender: genderSchema.optional(),
   age: z.string().max(10).optional(),
@@ -61,4 +65,3 @@ export function genderLabel(gender: Gender): string {
       return "その他";
   }
 }
-

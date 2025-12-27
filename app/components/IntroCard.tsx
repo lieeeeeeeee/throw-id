@@ -3,6 +3,7 @@
 import type { CardDraft, Gender } from "../lib/schema";
 import { CARD_HEIGHT, CARD_WIDTH, genderLabel } from "../lib/schema";
 import { getCardBackgroundStyle } from "../lib/backgrounds";
+import { cardFontClassMap } from "../lib/cardFonts";
 import { ICON_PLACEHOLDER } from "../lib/placeholders";
 
 function ratingLabel(text?: string): string {
@@ -99,6 +100,8 @@ export function IntroCard({ data }: { data: CardDraft }) {
   const iconSrc = data.iconDataUrl ?? ICON_PLACEHOLDER;
   const backgroundStyle = getCardBackgroundStyle(data.background ?? "white");
   const hasPatternBackground = (data.background ?? "white") !== "white";
+  const fontStyle = data.fontStyle ?? "normal";
+  const fontClass = cardFontClassMap[fontStyle];
 
   const playStyleTags = splitTags(data.playStyle);
   const favoriteGameTags = splitTags(data.favoriteGame);
@@ -120,7 +123,7 @@ export function IntroCard({ data }: { data: CardDraft }) {
 
   return (
     <div
-      className="relative overflow-hidden rounded-[28px] shadow-[0_18px_48px_rgba(0,0,0,0.12)] ring-1 ring-black/5"
+      className={`relative overflow-hidden rounded-[28px] shadow-[0_18px_48px_rgba(0,0,0,0.12)] ring-1 ring-black/5 ${fontClass}`}
       style={{
         width: CARD_WIDTH,
         height: CARD_HEIGHT,

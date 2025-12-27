@@ -11,7 +11,7 @@ const metadataBase = new URL(siteUrl);
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "japanese"],
 });
 
 const geistMono = Geist_Mono({

@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { CardDraft } from "../lib/schema";
 import { CARD_BACKGROUND_OPTIONS, getCardBackgroundStyle } from "../lib/backgrounds";
+import { cardFontClassMap } from "../lib/cardFonts";
 
 async function fileToDataUrl(file: File): Promise<string> {
   return await new Promise((resolve, reject) => {
@@ -257,6 +258,7 @@ export function CardForm({
 }) {
   const gender = data.gender ?? "";
   const background = data.background ?? "white";
+  const fontStyle = data.fontStyle ?? "normal";
 
   return (
     <div className="space-y-4">
@@ -439,6 +441,55 @@ export function CardForm({
                       />
                     </div>
                     <div className="mt-2 text-xs font-bold text-zinc-700">
+                      {opt.label}
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+          </Section>
+
+          <Section title="フォント">
+            <div className="rounded-2xl bg-zinc-50 p-4 ring-1 ring-black/5">
+              <div className="text-xs font-bold text-zinc-500">サンプル</div>
+              <div
+                className={`mt-2 text-xl font-semibold text-zinc-900 ${cardFontClassMap[fontStyle]}`}
+              >
+                ダーツがもっと好きになる
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-3">
+              {[
+                { id: "normal", label: "普通" },
+                { id: "bold", label: "太い" },
+                { id: "handwritten", label: "手書き" },
+              ].map((opt) => {
+                const checked = fontStyle === opt.id;
+                return (
+                  <label
+                    key={opt.id}
+                    className="group flex min-w-[120px] flex-1 cursor-pointer items-center gap-3 rounded-2xl bg-white p-3 ring-1 ring-black/10 transition hover:ring-black/20"
+                  >
+                    <input
+                      type="radio"
+                      name="fontStyle"
+                      value={opt.id}
+                      className="sr-only"
+                      checked={checked}
+                      onChange={() => onPatch({ fontStyle: opt.id as CardDraft["fontStyle"] })}
+                    />
+                    <div
+                      className={[
+                        "flex h-5 w-5 items-center justify-center rounded-full border",
+                        checked ? "border-zinc-900" : "border-black/20",
+                      ].join(" ")}
+                    >
+                      {checked ? (
+                        <div className="h-2.5 w-2.5 rounded-full bg-zinc-900" />
+                      ) : null}
+                    </div>
+                    <div className="text-sm font-semibold text-zinc-900">
                       {opt.label}
                     </div>
                   </label>
