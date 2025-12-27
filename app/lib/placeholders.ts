@@ -7,13 +7,7 @@ function svgToDataUrl(svg: string): string {
 
 export const ICON_PLACEHOLDER = svgToDataUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fce7f3"/>
-      <stop offset="1" stop-color="#e0e7ff"/>
-    </linearGradient>
-  </defs>
-  <rect width="256" height="256" rx="48" fill="url(#g)"/>
+  <rect width="256" height="256" rx="48" fill="#ffffff"/>
   <circle cx="128" cy="102" r="44" fill="#111827" opacity="0.12"/>
   <path d="M48 216c12-42 45-64 80-64s68 22 80 64" fill="#111827" opacity="0.12"/>
   <text x="128" y="242" text-anchor="middle" font-size="18" font-family="Arial, Helvetica, sans-serif" fill="#111827" opacity="0.55">

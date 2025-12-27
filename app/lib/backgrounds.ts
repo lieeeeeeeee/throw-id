@@ -40,7 +40,7 @@ export function getCardBackgroundStyle(background: CardBackground): CSSPropertie
 export const CARD_BACKGROUND_OPTIONS: CardBackgroundOption[] = [
   {
     id: "white",
-    label: "真っ白",
+    label: "無地",
     previewStyle: getCardBackgroundStyle("white"),
   },
   {

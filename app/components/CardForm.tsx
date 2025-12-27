@@ -261,11 +261,22 @@ export function CardForm({
   return (
     <div className="space-y-4">
       <Section title="背景">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+        <div className="flex gap-3 overflow-x-auto overflow-y-visible px-1 py-1">
           {CARD_BACKGROUND_OPTIONS.map((opt) => {
             const checked = background === opt.id;
+            const previewStyle =
+              opt.id === "white"
+                ? getCardBackgroundStyle(opt.id)
+                : {
+                    ...getCardBackgroundStyle(opt.id),
+                    backgroundSize: "190%",
+                    backgroundPosition: "center",
+                  };
             return (
-              <label key={opt.id} className="group block cursor-pointer">
+              <label
+                key={opt.id}
+                className="group block w-16 shrink-0 cursor-pointer"
+              >
                 <input
                   type="radio"
                   name="background"
@@ -276,20 +287,17 @@ export function CardForm({
                 />
                 <div
                   className={[
-                    "overflow-hidden rounded-2xl ring-1 ring-black/10 transition",
+                    "aspect-square w-16 overflow-hidden rounded-xl ring-1 ring-black/10 transition",
                     checked ? "ring-2 ring-zinc-900" : "hover:ring-black/25",
                   ].join(" ")}
                 >
                   <div
-                    className="h-24 w-full"
-                    style={getCardBackgroundStyle(opt.id)}
+                    className="h-full w-full rounded-[10px]"
+                    style={previewStyle}
                   />
                 </div>
-                <div className="mt-2 flex items-center justify-between text-xs font-bold text-zinc-700">
-                  <span>{opt.label}</span>
-                  {checked ? (
-                    <span className="text-[10px] text-zinc-900">選択中</span>
-                  ) : null}
+                <div className="mt-2 text-xs font-bold text-zinc-700">
+                  {opt.label}
                 </div>
               </label>
             );
