@@ -64,6 +64,14 @@ function textOrPlaceholder(label: string, value?: string, placeholder = "--") {
   return `${label}: ${v}`;
 }
 
+function splitTags(text?: string): string[] {
+  if (!text) return [];
+  return text
+    .split(/[ ,、./]+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
 function ImageBox({
   label,
   dataUrl,
@@ -92,8 +100,8 @@ export function IntroCard({ data }: { data: CardDraft }) {
   const backgroundStyle = getCardBackgroundStyle(data.background ?? "white");
   const hasPatternBackground = (data.background ?? "white") !== "white";
 
-  const playStyle = data.playStyle?.trim();
-  const favoriteGame = data.favoriteGame?.trim();
+  const playStyleTags = splitTags(data.playStyle);
+  const favoriteGameTags = splitTags(data.favoriteGame);
   const thumbs = [
     { label: "ライブテーマ", dataUrl: data.liveThemeImageDataUrl },
     { label: "ファンダーツ", dataUrl: data.funDartsImageDataUrl },
@@ -182,7 +190,13 @@ export function IntroCard({ data }: { data: CardDraft }) {
                 プレイスタイル
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
-                {playStyle ? <Chip text={playStyle} /> : <Chip text="未設定" muted />}
+                {playStyleTags.length ? (
+                  playStyleTags.map((tag, idx) => (
+                    <Chip key={`${tag}-${idx}`} text={tag} />
+                  ))
+                ) : (
+                  <Chip text="未設定" muted />
+                )}
               </div>
             </div>
             <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 shadow-[0_0_12px_rgba(0,0,0,0.18)] box-border">
@@ -190,8 +204,10 @@ export function IntroCard({ data }: { data: CardDraft }) {
                 好きなゲーム
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
-                {favoriteGame ? (
-                  <Chip text={favoriteGame} />
+                {favoriteGameTags.length ? (
+                  favoriteGameTags.map((tag, idx) => (
+                    <Chip key={`${tag}-${idx}`} text={tag} />
+                  ))
                 ) : (
                   <Chip text="未設定" muted />
                 )}
