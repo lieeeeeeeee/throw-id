@@ -6,11 +6,22 @@ export const CARD_HEIGHT = 870 as const;
 export const genderSchema = z.enum(["male", "female", "other"]);
 export type Gender = z.infer<typeof genderSchema>;
 
+export const cardBackgroundSchema = z.enum([
+  "white",
+  "pattern0",
+  "pattern1",
+  "pattern2",
+  "pattern3",
+]);
+export type CardBackground = z.infer<typeof cardBackgroundSchema>;
+
 const imageDataUrlSchema = z.string().startsWith("data:image/");
 
 export const cardDraftSchema = z.object({
   displayName: z.string().max(20).default("なまえ"),
   iconDataUrl: imageDataUrlSchema.optional(),
+
+  background: cardBackgroundSchema.default("white"),
 
   gender: genderSchema.optional(),
   age: z.string().max(10).optional(),
@@ -50,5 +61,4 @@ export function genderLabel(gender: Gender): string {
       return "その他";
   }
 }
-
 

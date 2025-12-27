@@ -19,9 +19,11 @@ function fileSafe(name: string) {
     .slice(0, 40);
 }
 
+type ZodIssuePath = Array<string | number>;
+
 function formatErrors(errors: unknown): string {
   try {
-    const zerr = errors as { issues?: Array<{ message: string; path: any[] }> };
+    const zerr = errors as { issues?: Array<{ message: string; path: ZodIssuePath }> };
     if (!zerr.issues?.length) return "入力内容を確認してください";
     const lines = zerr.issues
       .slice(0, 6)
@@ -36,6 +38,7 @@ export default function Home() {
   const [draft, setDraft] = useState<CardDraft>(() => ({
     displayName: "",
     favoritePlayers: [],
+    background: "white",
   }));
   const [exportError, setExportError] = useState<string | null>(null);
   const exportRef = useRef<HTMLDivElement | null>(null);
@@ -87,6 +90,7 @@ export default function Home() {
                   setDraft({
                     displayName: "",
                     favoritePlayers: [],
+                    background: "white",
                   });
                   setExportError(null);
                 }}

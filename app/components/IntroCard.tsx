@@ -2,6 +2,7 @@
 
 import type { CardDraft, Gender } from "../lib/schema";
 import { CARD_HEIGHT, CARD_WIDTH, genderLabel } from "../lib/schema";
+import { getCardBackgroundStyle } from "../lib/backgrounds";
 import { ICON_PLACEHOLDER } from "../lib/placeholders";
 
 function ratingLabel(text?: string): string {
@@ -25,14 +26,10 @@ function badge(text: string, tone: "dark" | "light" = "light") {
     );
   }
   return (
-    <span className={`${base} bg-white/75 text-zinc-900 ring-1 ring-black/5`}>
+    <span className={`${base} bg-white text-zinc-900 ring-1 ring-black/5`}>
       {text}
     </span>
   );
-}
-
-function chip(text: string, muted = false) {
-  return <Chip text={text} muted={muted} />;
 }
 
 function Chip({ text, muted }: { text: string; muted?: boolean }) {
@@ -41,8 +38,8 @@ function Chip({ text, muted }: { text: string; muted?: boolean }) {
       className={[
         "inline-flex items-center rounded-full px-3 py-1 text-[12px] font-medium",
         muted
-          ? "bg-white/55 text-zinc-600 ring-1 ring-black/5"
-          : "bg-white/80 text-zinc-900 ring-1 ring-black/5",
+          ? "bg-white text-zinc-600 ring-1 ring-black/5"
+          : "bg-white text-zinc-900 ring-1 ring-black/5",
       ].join(" ")}
     >
       {text}
@@ -76,7 +73,7 @@ function ImageBox({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <div className="h-[120px] w-[170px] overflow-hidden rounded-2xl bg-white/60 p-2 ring-1 ring-black/5">
+      <div className="h-[120px] w-[170px] overflow-hidden rounded-2xl bg-white p-2 ring-1 ring-black/5">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={dataUrl}
@@ -92,6 +89,7 @@ function ImageBox({
 
 export function IntroCard({ data }: { data: CardDraft }) {
   const iconSrc = data.iconDataUrl ?? ICON_PLACEHOLDER;
+  const backgroundStyle = getCardBackgroundStyle(data.background ?? "white");
 
   const playStyle = data.playStyle?.trim();
   const favoriteGame = data.favoriteGame?.trim();
@@ -117,17 +115,13 @@ export function IntroCard({ data }: { data: CardDraft }) {
       style={{
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
-        backgroundImage:
-          "linear-gradient(135deg,#fff1f2 0%,#eef2ff 45%,#ecfeff 100%),radial-gradient(circle at 1px 1px, rgba(17,24,39,0.10) 1px, transparent 0)",
-        backgroundSize: "auto, 18px 18px",
+        ...backgroundStyle,
       }}
     >
-      <div className="absolute inset-0 bg-white/25" />
-
       <div className="relative flex h-full min-h-0 flex-col box-border px-[28px] py-[26px]">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <div className="h-[118px] w-[118px] overflow-hidden rounded-[32px] bg-white/70 ring-1 ring-black/5">
+          <div className="h-[118px] w-[118px] overflow-hidden rounded-[32px] bg-white ring-1 ring-black/5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={iconSrc}
@@ -167,7 +161,7 @@ export function IntroCard({ data }: { data: CardDraft }) {
         >
           {/* Row 1: プレイスタイル / 好きなゲーム（高さ・位置を揃える） */}
           <div className="grid min-h-[60px] grid-cols-2 gap-4">
-            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-3 ring-1 ring-black/5 box-border">
+            <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border">
               <div className="text-[11px] font-bold text-zinc-600">
                 プレイスタイル
               </div>
@@ -175,7 +169,7 @@ export function IntroCard({ data }: { data: CardDraft }) {
                 {playStyle ? <Chip text={playStyle} /> : <Chip text="未設定" muted />}
               </div>
             </div>
-            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-3 ring-1 ring-black/5 box-border">
+            <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border">
               <div className="text-[11px] font-bold text-zinc-600">
                 好きなゲーム
               </div>
@@ -191,7 +185,7 @@ export function IntroCard({ data }: { data: CardDraft }) {
 
           {/* Row 2: 好きな選手 と（バレル/得意ナンバー）を上下揃え */}
           <div className="grid min-h-[70px] grid-cols-2 gap-4">
-            <div className="h-full overflow-hidden rounded-3xl bg-white/55 p-3 ring-1 ring-black/5 box-border">
+            <div className="h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border">
               <div className="text-[11px] font-bold text-zinc-600">好きな選手</div>
               <div className="mt-2">
                 <ul className="space-y-1 text-[14px] font-semibold text-zinc-900">
@@ -205,13 +199,13 @@ export function IntroCard({ data }: { data: CardDraft }) {
               </div>
             </div>
             <div className="grid h-full grid-rows-2 gap-2">
-              <div className="overflow-hidden rounded-3xl bg-white/55 p-3 ring-1 ring-black/5 box-border">
+              <div className="overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border">
                 <div className="text-[11px] font-bold text-zinc-600">バレル</div>
                 <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
                   {data.barrel?.trim() || "--"}
                 </div>
               </div>
-              <div className="overflow-hidden rounded-3xl bg-white/55 p-3 ring-1 ring-black/5 box-border">
+              <div className="overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border">
                 <div className="text-[11px] font-bold text-zinc-600">得意ナンバー</div>
                 <div className="mt-2 line-clamp-2 text-[14px] font-semibold text-zinc-900">
                   {bestNums}
@@ -222,7 +216,7 @@ export function IntroCard({ data }: { data: CardDraft }) {
 
           {/* Row 3: コメント（画像は別ブロックで下に配置） */}
           <div className="min-h-0 flex flex-col gap-3">
-            <div className="min-h-0 flex-1 overflow-hidden rounded-3xl bg-white/60 p-4 ring-1 ring-black/5">
+            <div className="min-h-0 flex-1 overflow-hidden rounded-3xl bg-white p-4 ring-1 ring-black/5">
               <div className="flex h-full min-h-0 flex-col overflow-hidden">
                 <div className="text-[11px] font-bold text-zinc-600">コメント</div>
                 <div className="mt-2 min-h-0 flex-1 line-clamp-8 break-words text-[15px] font-semibold leading-6 text-zinc-900">

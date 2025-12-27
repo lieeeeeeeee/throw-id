@@ -3,6 +3,7 @@
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { CardDraft } from "../lib/schema";
+import { CARD_BACKGROUND_OPTIONS, getCardBackgroundStyle } from "../lib/backgrounds";
 
 async function fileToDataUrl(file: File): Promise<string> {
   return await new Promise((resolve, reject) => {
@@ -169,8 +170,8 @@ function ImageInput({
         }}
         className="group relative h-20 w-20 overflow-hidden rounded-2xl bg-white ring-1 ring-black/10"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         {value ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={value}
             alt={label}
@@ -255,9 +256,47 @@ export function CardForm({
   onPatch: (patch: Partial<CardDraft>) => void;
 }) {
   const gender = data.gender ?? "";
+  const background = data.background ?? "white";
 
   return (
     <div className="space-y-4">
+      <Section title="背景">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+          {CARD_BACKGROUND_OPTIONS.map((opt) => {
+            const checked = background === opt.id;
+            return (
+              <label key={opt.id} className="group block cursor-pointer">
+                <input
+                  type="radio"
+                  name="background"
+                  value={opt.id}
+                  className="sr-only"
+                  checked={checked}
+                  onChange={() => onPatch({ background: opt.id })}
+                />
+                <div
+                  className={[
+                    "overflow-hidden rounded-2xl ring-1 ring-black/10 transition",
+                    checked ? "ring-2 ring-zinc-900" : "hover:ring-black/25",
+                  ].join(" ")}
+                >
+                  <div
+                    className="h-24 w-full"
+                    style={getCardBackgroundStyle(opt.id)}
+                  />
+                </div>
+                <div className="mt-2 flex items-center justify-between text-xs font-bold text-zinc-700">
+                  <span>{opt.label}</span>
+                  {checked ? (
+                    <span className="text-[10px] text-zinc-900">選択中</span>
+                  ) : null}
+                </div>
+              </label>
+            );
+          })}
+        </div>
+      </Section>
+
       <Section title="基本">
         <div className="space-y-2">
           <RequiredLabel text="カード名" />
@@ -464,5 +503,3 @@ export function CardForm({
     </div>
   );
 }
-
-
