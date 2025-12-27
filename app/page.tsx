@@ -86,6 +86,26 @@ export default function Home() {
     return `throw_id_${fileSafe(base)}.png`;
   }, [draft.displayName]);
 
+  const handleDownload = async () => {
+    const res = cardExportSchema.safeParse(draft);
+    if (!res.success) {
+      setExportError(formatErrors(res.error));
+      return;
+    }
+    setExportError(null);
+
+    if (!exportRef.current) {
+      setExportError("カードの生成に失敗しました");
+      return;
+    }
+    await exportElementPng615x870({
+      element: exportRef.current,
+      filename,
+      width: CARD_WIDTH,
+      height: cardHeight,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50">
       <header className="border-b border-black/5 bg-white">
@@ -130,25 +150,7 @@ export default function Home() {
                 type="button"
                 aria-label="ダウンロード"
                 disabled={!canExport}
-                onClick={async () => {
-                  const res = cardExportSchema.safeParse(draft);
-                  if (!res.success) {
-                    setExportError(formatErrors(res.error));
-                    return;
-                  }
-                  setExportError(null);
-
-                  if (!exportRef.current) {
-                    setExportError("カードの生成に失敗しました");
-                    return;
-                  }
-                  await exportElementPng615x870({
-                    element: exportRef.current,
-                    filename,
-                    width: CARD_WIDTH,
-                    height: cardHeight,
-                  });
-                }}
+                onClick={handleDownload}
                 className={[
                   "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white",
                   canExport ? "bg-zinc-900 hover:bg-zinc-800" : "bg-zinc-400",
@@ -223,6 +225,34 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
+                </div>
+                <div className="mt-4 flex justify-center">
+                  <button
+                    type="button"
+                    aria-label="プレビューをダウンロード"
+                    disabled={!canExport}
+                    onClick={handleDownload}
+                    className={[
+                      "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white",
+                      canExport ? "bg-zinc-900 hover:bg-zinc-800" : "bg-zinc-400",
+                    ].join(" ")}
+                  >
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      className="h-4 w-4 shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 3v12" />
+                      <path d="M7 10l5 5 5-5" />
+                      <path d="M4 21h16" />
+                    </svg>
+                    ダウンロード
+                  </button>
                 </div>
               </div>
 
