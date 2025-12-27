@@ -32,7 +32,7 @@ export default function Home() {
   const previewWrapRef = useRef<HTMLDivElement | null>(null);
   const [previewScale, setPreviewScale] = useState(1);
   const previewInset = 16;
-  const [cardHeight, setCardHeight] = useState(CARD_HEIGHT);
+  const [cardHeight, setCardHeight] = useState<number>(CARD_HEIGHT);
 
   const canExport = useMemo(() => cardExportSchema.safeParse(draft).success, [draft]);
   const hasDetails = useMemo(() => hasDetailedSettings(draft), [draft]);
