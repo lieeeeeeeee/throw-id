@@ -34,6 +34,7 @@ export default function Home() {
   const [previewScale, setPreviewScale] = useState(1);
   const previewInset = 16;
   const [cardHeight, setCardHeight] = useState<number>(CARD_HEIGHT);
+  const [isExporting, setIsExporting] = useState(false);
 
   const canExport = useMemo(() => cardExportSchema.safeParse(draft).success, [draft]);
   const hasDetails = useMemo(() => hasDetailedSettings(draft), [draft]);
@@ -81,6 +82,7 @@ export default function Home() {
   }, [draft.displayName]);
 
   const handleDownload = async () => {
+    if (isExporting) return;
     const res = cardExportSchema.safeParse(draft);
     if (!res.success) {
       setShowValidation(true);
@@ -101,16 +103,21 @@ export default function Home() {
     if (!exportRef.current) {
       return;
     }
-    await exportElementPng615x870({
-      element: exportRef.current,
-      filename,
-      width: CARD_WIDTH,
-      height: cardHeight,
-      background: {
-        color: "#ffffff",
-        imageSrc: getCardBackgroundImageSrc(draft.background ?? "white"),
-      },
-    });
+    try {
+      setIsExporting(true);
+      await exportElementPng615x870({
+        element: exportRef.current,
+        filename,
+        width: CARD_WIDTH,
+        height: cardHeight,
+        background: {
+          color: "#ffffff",
+          imageSrc: getCardBackgroundImageSrc(draft.background ?? "white"),
+        },
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -158,25 +165,41 @@ export default function Home() {
                 aria-label="ダウンロード"
                 onClick={handleDownload}
                 className={[
-                  "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white",
-                  canExport ? "bg-zinc-900 hover:bg-zinc-800" : "bg-zinc-400",
+                  "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white transition-colors",
+                  isExporting
+                    ? "bg-zinc-700"
+                    : canExport
+                      ? "bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-700"
+                      : "bg-zinc-400",
+                  isExporting ? "cursor-not-allowed opacity-90" : "",
                 ].join(" ")}
+                disabled={!canExport || isExporting}
               >
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  className="h-4 w-4 shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 3v12" />
-                  <path d="M7 10l5 5 5-5" />
-                  <path d="M4 21h16" />
-                </svg>
-                <span className="hidden sm:inline">ダウンロード</span>
+                {isExporting ? (
+                  <span className="flex items-center gap-2">
+                    <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
+                    <span className="hidden sm:inline">生成中...</span>
+                    <span className="sm:hidden">生成中</span>
+                  </span>
+                ) : (
+                  <>
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      className="h-4 w-4 shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 3v12" />
+                      <path d="M7 10l5 5 5-5" />
+                      <path d="M4 21h16" />
+                    </svg>
+                    <span className="hidden sm:inline">ダウンロード</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -235,24 +258,39 @@ export default function Home() {
                     onClick={handleDownload}
                     className={[
                       "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white",
-                      canExport ? "bg-zinc-900 hover:bg-zinc-800" : "bg-zinc-400",
-                    ].join(" ")}
+                      isExporting
+                    ? "bg-zinc-700"
+                    : canExport
+                      ? "bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-700"
+                      : "bg-zinc-400",
+                  isExporting ? "cursor-not-allowed opacity-90" : "",
+                ].join(" ")}
+                    disabled={!canExport || isExporting}
                   >
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 24 24"
-                      className="h-4 w-4 shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M12 3v12" />
-                      <path d="M7 10l5 5 5-5" />
-                      <path d="M4 21h16" />
-                    </svg>
-                    ダウンロード
+                    {isExporting ? (
+                      <span className="flex items-center gap-2">
+                        <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
+                        <span>生成中...</span>
+                      </span>
+                    ) : (
+                      <>
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 24 24"
+                          className="h-4 w-4 shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M12 3v12" />
+                          <path d="M7 10l5 5 5-5" />
+                          <path d="M4 21h16" />
+                        </svg>
+                        ダウンロード
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
