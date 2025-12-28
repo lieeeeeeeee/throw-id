@@ -12,6 +12,7 @@ import {
   cardExportSchema,
 } from "./lib/schema";
 import { hasDetailedSettings } from "./lib/cardLayout";
+import { downloadBlob } from "./lib/files";
 
 function fileSafe(name: string) {
   return name
@@ -35,6 +36,10 @@ export default function Home() {
   const previewInset = 16;
   const [cardHeight, setCardHeight] = useState<number>(CARD_HEIGHT);
   const [isExporting, setIsExporting] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportStatus, setExportStatus] = useState<"idle" | "working" | "done">("idle");
+  const [lastExportBlob, setLastExportBlob] = useState<Blob | null>(null);
 
   const canExport = useMemo(() => cardExportSchema.safeParse(draft).success, [draft]);
   const hasDetails = useMemo(() => hasDetailedSettings(draft), [draft]);
@@ -82,7 +87,10 @@ export default function Home() {
   }, [draft.displayName]);
 
   const handleDownload = async () => {
-    if (isExporting) return;
+    if (isExporting || isSharing) return;
+    setExportModalOpen(true);
+    setExportStatus("working");
+    setLastExportBlob(null);
     const res = cardExportSchema.safeParse(draft);
     if (!res.success) {
       setShowValidation(true);
@@ -101,13 +109,13 @@ export default function Home() {
     }
 
     if (!exportRef.current) {
+      setExportStatus("idle");
       return;
     }
     try {
       setIsExporting(true);
-      await exportElementPng615x870({
+      const blob = await exportElementPng615x870({
         element: exportRef.current,
-        filename,
         width: CARD_WIDTH,
         height: cardHeight,
         background: {
@@ -115,8 +123,49 @@ export default function Home() {
           imageSrc: getCardBackgroundImageSrc(draft.background ?? "white"),
         },
       });
+      setLastExportBlob(blob);
+      setExportStatus("done");
+      downloadBlob(blob, filename);
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  const handleShare = async () => {
+    if (isSharing || isExporting) return;
+    const res = cardExportSchema.safeParse(draft);
+    if (!res.success) {
+      setShowValidation(true);
+      return;
+    }
+    try {
+      setIsSharing(true);
+      const blob =
+        lastExportBlob ??
+        (await exportElementPng615x870({
+          element: exportRef.current!,
+          width: CARD_WIDTH,
+          height: cardHeight,
+          background: {
+            color: "#ffffff",
+            imageSrc: getCardBackgroundImageSrc(draft.background ?? "white"),
+          },
+        }));
+      setLastExportBlob(blob);
+      const file = new File([blob], filename, { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "Throw ID",
+          text: "ダーツ自己紹介カード",
+        });
+      } else {
+        downloadBlob(blob, filename);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -166,15 +215,15 @@ export default function Home() {
                 onClick={handleDownload}
                 className={[
                   "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white transition-colors",
-                  isExporting
-                    ? "bg-zinc-700"
-                    : canExport
-                      ? "bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-700"
-                      : "bg-zinc-400",
-                  isExporting ? "cursor-not-allowed opacity-90" : "",
-                ].join(" ")}
-                disabled={!canExport || isExporting}
-              >
+                      isExporting
+                        ? "bg-zinc-700"
+                        : canExport
+                          ? "bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-700"
+                          : "bg-zinc-400",
+                      isExporting || isSharing ? "cursor-not-allowed opacity-90" : "",
+                    ].join(" ")}
+                    disabled={!canExport || isExporting || isSharing}
+                  >
                 {isExporting ? (
                   <span className="flex items-center gap-2">
                     <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
@@ -257,20 +306,25 @@ export default function Home() {
                     aria-label="プレビューをダウンロード"
                     onClick={handleDownload}
                     className={[
-                      "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white",
-                      isExporting
+                  "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white transition-colors",
+                  isExporting
                     ? "bg-zinc-700"
                     : canExport
                       ? "bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-700"
                       : "bg-zinc-400",
-                  isExporting ? "cursor-not-allowed opacity-90" : "",
+                  isExporting || isSharing ? "cursor-not-allowed opacity-90" : "",
                 ].join(" ")}
-                    disabled={!canExport || isExporting}
+                    disabled={!canExport || isExporting || isSharing}
                   >
                     {isExporting ? (
                       <span className="flex items-center gap-2">
                         <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
                         <span>生成中...</span>
+                      </span>
+                    ) : isSharing ? (
+                      <span className="flex items-center gap-2">
+                        <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
+                        <span>共有中...</span>
                       </span>
                     ) : (
                       <>
@@ -339,6 +393,88 @@ export default function Home() {
             </span>
           </a>
         </div>
+
+        {exportModalOpen ? (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-black/10">
+              <div className="text-center text-lg font-extrabold text-zinc-900">
+                画像を作成しています
+              </div>
+              <div className="mt-4 flex justify-center">
+                {exportStatus === "working" ? (
+                  <div className="h-12 w-12 animate-spin rounded-full border-4 border-zinc-900/20 border-t-zinc-900" />
+                ) : (
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200">
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      className="h-7 w-7"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m5 13 4 4 10-10" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <div className="mt-3 text-center text-sm font-semibold text-zinc-600">
+                {exportStatus === "working"
+                  ? "少々お待ちください..."
+                  : "完了しました！共有または閉じるを選択できます。"}
+              </div>
+              <div className="mt-5 flex flex-col gap-3">
+                <button
+                  type="button"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-extrabold text-white transition-colors hover:bg-zinc-800 active:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={handleShare}
+                  disabled={exportStatus !== "done" || isSharing}
+                >
+                  {isSharing ? (
+                    <>
+                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
+                      <span>共有中...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        className="h-4 w-4 shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                        <polyline points="16 6 12 2 8 6" />
+                        <line x1="12" x2="12" y1="2" y2="15" />
+                      </svg>
+                      <span>共有</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-extrabold text-zinc-900 ring-1 ring-black/10 transition-colors hover:bg-zinc-50 active:bg-zinc-100"
+                  onClick={() => {
+                    setExportModalOpen(false);
+                    setExportStatus("idle");
+                  }}
+                >
+                  閉じる
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </main>
     </div>
   );

@@ -9,17 +9,6 @@ async function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
-
 function drawCover(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
@@ -51,20 +40,18 @@ function drawCover(
 
 export async function exportElementPng615x870({
   element,
-  filename,
   width,
   height,
   background,
 }: {
   element: HTMLElement;
-  filename: string;
   width: number;
   height: number;
   background?: {
     color?: string;
     imageSrc?: string | null;
   };
-}) {
+}): Promise<Blob> {
   // いったん高解像度でレンダ→最終的に指定サイズへダウンスケール
   const rawDataUrl = await toPng(element, {
     cacheBust: true,
@@ -104,7 +91,7 @@ export async function exportElementPng615x870({
     }, "image/png");
   });
 
-  downloadBlob(blob, filename);
+  return blob;
 }
 
 
