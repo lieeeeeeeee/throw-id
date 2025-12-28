@@ -101,7 +101,7 @@ function ImageBox({
     <div className="flex flex-col gap-1">
       <div
         className={[
-          "h-[120px] w-[170px] overflow-hidden rounded-2xl bg-white p-2 ring-1 ring-black/5",
+          "h-[120px] w-[170px] overflow-hidden rounded-2xl bg-white p-2 ring-2 ring-black/10",
           shadowClass,
         ].join(" ")}
       >
@@ -133,13 +133,7 @@ export function IntroCard({
   const fontStyle = data.fontStyle ?? "normal";
   const fontClass = cardFontClassMap[fontStyle];
   const isExport = renderMode === "export";
-  const enableCssShadow = renderMode === "preview";
-  const cardShadowClass = enableCssShadow
-    ? "shadow-[0_18px_48px_rgba(0,0,0,0.12)]"
-    : "";
-  const glowShadow = enableCssShadow
-    ? "shadow-[0_0_12px_rgba(0,0,0,0.18)]"
-    : "";
+  const glowShadow = "";
 
   const playStyleTags = splitTags(data.playStyle);
   const favoriteGameTags = splitTags(data.favoriteGame);
@@ -161,7 +155,7 @@ export function IntroCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-[28px] ring-1 ring-black/5 ${cardShadowClass} ${fontClass}`}
+      className={`relative overflow-hidden rounded-[28px] ring-1 ring-black/10 ${fontClass}`}
       style={{
         width: CARD_WIDTH,
         height: compact ? "auto" : CARD_HEIGHT,
@@ -175,7 +169,7 @@ export function IntroCard({
         <div className="flex items-center gap-4">
           <div
             className={[
-              "h-[118px] w-[118px] overflow-hidden rounded-[32px] bg-white ring-1 ring-black/5",
+              "h-[118px] w-[118px] overflow-hidden rounded-[32px] bg-white ring-2 ring-black/10",
               glowShadow,
             ].join(" ")}
           >
@@ -193,7 +187,7 @@ export function IntroCard({
               <div className="min-w-0 w-full">
                 <div
                   className={[
-                    "w-full rounded-full bg-white px-4 py-1.5 ring-1 ring-black/5",
+                    "w-full rounded-full bg-white px-4 py-1.5 ring-2 ring-black/10",
                     glowShadow,
                   ].join(" ")}
                 >
@@ -220,7 +214,7 @@ export function IntroCard({
             <div className="grid min-h-[60px] grid-cols-2 gap-4">
               <div
                 className={[
-                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
                   glowShadow,
                 ].join(" ")}
               >
@@ -239,7 +233,7 @@ export function IntroCard({
               </div>
               <div
                 className={[
-                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
                   glowShadow,
                 ].join(" ")}
               >
@@ -270,7 +264,7 @@ export function IntroCard({
             <div className="grid min-h-[60px] grid-cols-2 gap-4">
               <div
                 className={[
-                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
                   glowShadow,
                 ].join(" ")}
               >
@@ -289,7 +283,7 @@ export function IntroCard({
               </div>
               <div
                 className={[
-                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
                   glowShadow,
                 ].join(" ")}
               >
@@ -312,7 +306,7 @@ export function IntroCard({
             <div className="grid min-h-[70px] grid-cols-2 gap-4">
               <div
                 className={[
-                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
                   glowShadow,
                 ].join(" ")}
               >
@@ -331,7 +325,7 @@ export function IntroCard({
               <div className="grid h-full grid-rows-2 gap-2">
                 <div
                   className={[
-                    "overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                    "overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
                     glowShadow,
                   ].join(" ")}
                 >
@@ -342,7 +336,7 @@ export function IntroCard({
                 </div>
                 <div
                   className={[
-                    "overflow-hidden rounded-3xl bg-white p-3 ring-1 ring-black/5 box-border",
+                    "overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
                     glowShadow,
                   ].join(" ")}
                 >
@@ -358,7 +352,7 @@ export function IntroCard({
             <div className="min-h-0 flex flex-col gap-3">
               <div
                 className={[
-                  "min-h-0 flex-1 overflow-hidden rounded-3xl bg-white p-4 ring-1 ring-black/5",
+                  "min-h-0 flex-1 overflow-hidden rounded-3xl bg-white p-4 ring-2 ring-black/10",
                   glowShadow,
                 ].join(" ")}
               >
