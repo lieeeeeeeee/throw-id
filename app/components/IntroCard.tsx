@@ -22,6 +22,7 @@ function badge(
   text: string,
   tone: "dark" | "light" = "light",
   shadowClass = "",
+  borderClass = "",
 ) {
   const base = [
     "inline-flex items-center rounded-full px-4 py-1.5 text-[13px] font-semibold tracking-tight",
@@ -33,7 +34,7 @@ function badge(
     );
   }
   return (
-    <span className={`${base} bg-white text-zinc-900 ring-1 ring-black/5`}>
+    <span className={`${base} bg-white text-zinc-900 ${borderClass}`}>
       {text}
     </span>
   );
@@ -43,18 +44,20 @@ function Chip({
   text,
   muted,
   shadowClass = "",
+  borderClass = "",
 }: {
   text: string;
   muted?: boolean;
   shadowClass?: string;
+  borderClass?: string;
 }) {
   return (
     <span
       className={[
         "inline-flex items-center rounded-full px-3 py-1 text-[12px] font-medium",
         muted
-          ? "bg-white text-zinc-600 ring-1 ring-black/5"
-          : "bg-white text-zinc-900 ring-1 ring-black/5",
+          ? `bg-white text-zinc-600 ${borderClass}`
+          : `bg-white text-zinc-900 ${borderClass}`,
         shadowClass,
       ].join(" ")}
     >
@@ -92,16 +95,19 @@ function ImageBox({
   label,
   dataUrl,
   shadowClass = "",
+  borderClass = "",
 }: {
   label: string;
   dataUrl: string;
   shadowClass?: string;
+  borderClass?: string;
 }) {
   return (
     <div className="flex flex-col gap-1">
       <div
         className={[
-          "h-[120px] w-[170px] overflow-hidden rounded-2xl bg-white p-2 ring-2 ring-black/10",
+          "h-[120px] w-[170px] overflow-hidden rounded-2xl bg-white p-2",
+          borderClass,
           shadowClass,
         ].join(" ")}
       >
@@ -134,6 +140,9 @@ export function IntroCard({
   const fontClass = cardFontClassMap[fontStyle];
   const isExport = renderMode === "export";
   const glowShadow = "";
+  const cardBorderClass = isExport ? "border border-black/10" : "ring-1 ring-black/10";
+  const ringLightClass = isExport ? "border border-black/10" : "ring-1 ring-black/5";
+  const ringMediumClass = isExport ? "border-2 border-black/10" : "ring-2 ring-black/10";
 
   const playStyleTags = splitTags(data.playStyle);
   const favoriteGameTags = splitTags(data.favoriteGame);
@@ -155,7 +164,7 @@ export function IntroCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-[28px] ring-1 ring-black/10 ${fontClass}`}
+      className={`relative overflow-hidden rounded-[28px] ${cardBorderClass} ${fontClass}`}
       style={{
         width: CARD_WIDTH,
         height: compact ? "auto" : CARD_HEIGHT,
@@ -169,7 +178,8 @@ export function IntroCard({
         <div className="flex items-center gap-4">
           <div
             className={[
-              "h-[118px] w-[118px] overflow-hidden rounded-[32px] bg-white ring-2 ring-black/10",
+              "h-[118px] w-[118px] overflow-hidden rounded-[32px] bg-white",
+              ringMediumClass,
               glowShadow,
             ].join(" ")}
           >
@@ -187,7 +197,8 @@ export function IntroCard({
               <div className="min-w-0 w-full">
                 <div
                   className={[
-                    "w-full rounded-full bg-white px-4 py-1.5 ring-2 ring-black/10",
+                    "w-full rounded-full bg-white px-4 py-1.5",
+                    ringMediumClass,
                     glowShadow,
                   ].join(" ")}
                 >
@@ -197,14 +208,14 @@ export function IntroCard({
                 </div>
                 <div className="mt-1 flex flex-wrap gap-2">
                   {badge(ratingLabel(data.rating), "dark", glowShadow)}
-                  {badge(experienceLabel(data.dartsExperience), "light", glowShadow)}
+                  {badge(experienceLabel(data.dartsExperience), "light", glowShadow, ringLightClass)}
                 </div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              {badge(genderOrPlaceholder(data.gender), "light", glowShadow)}
-              {badge(ageOrPlaceholder(data), "light", glowShadow)}
-              {badge(textOrPlaceholder("エリア", data.area), "light", glowShadow)}
+              {badge(genderOrPlaceholder(data.gender), "light", glowShadow, ringLightClass)}
+              {badge(ageOrPlaceholder(data), "light", glowShadow, ringLightClass)}
+              {badge(textOrPlaceholder("エリア", data.area), "light", glowShadow, ringLightClass)}
             </div>
           </div>
         </div>
@@ -214,7 +225,8 @@ export function IntroCard({
             <div className="grid min-h-[60px] grid-cols-2 gap-4">
               <div
                 className={[
-                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 box-border",
+                  ringMediumClass,
                   glowShadow,
                 ].join(" ")}
               >
@@ -224,16 +236,22 @@ export function IntroCard({
                 <div className="mt-2 flex flex-wrap gap-2">
                   {playStyleTags.length ? (
                     playStyleTags.map((tag, idx) => (
-                      <Chip key={`${tag}-${idx}`} text={tag} shadowClass={glowShadow} />
+                      <Chip
+                        key={`${tag}-${idx}`}
+                        text={tag}
+                        shadowClass={glowShadow}
+                        borderClass={ringLightClass}
+                      />
                     ))
                   ) : (
-                    <Chip text="未設定" muted shadowClass={glowShadow} />
+                    <Chip text="未設定" muted shadowClass={glowShadow} borderClass={ringLightClass} />
                   )}
                 </div>
               </div>
               <div
                 className={[
-                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 box-border",
+                  ringMediumClass,
                   glowShadow,
                 ].join(" ")}
               >
@@ -243,10 +261,15 @@ export function IntroCard({
                 <div className="mt-2 flex flex-wrap gap-2">
                   {favoriteGameTags.length ? (
                     favoriteGameTags.map((tag, idx) => (
-                      <Chip key={`${tag}-${idx}`} text={tag} shadowClass={glowShadow} />
+                      <Chip
+                        key={`${tag}-${idx}`}
+                        text={tag}
+                        shadowClass={glowShadow}
+                        borderClass={ringLightClass}
+                      />
                     ))
                   ) : (
-                    <Chip text="未設定" muted shadowClass={glowShadow} />
+                    <Chip text="未設定" muted shadowClass={glowShadow} borderClass={ringLightClass} />
                   )}
                 </div>
               </div>
@@ -264,7 +287,8 @@ export function IntroCard({
             <div className="grid min-h-[60px] grid-cols-2 gap-4">
               <div
                 className={[
-                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 box-border",
+                  ringMediumClass,
                   glowShadow,
                 ].join(" ")}
               >
@@ -274,16 +298,22 @@ export function IntroCard({
                 <div className="mt-2 flex flex-wrap gap-2">
                   {playStyleTags.length ? (
                     playStyleTags.map((tag, idx) => (
-                      <Chip key={`${tag}-${idx}`} text={tag} shadowClass={glowShadow} />
+                      <Chip
+                        key={`${tag}-${idx}`}
+                        text={tag}
+                        shadowClass={glowShadow}
+                        borderClass={ringLightClass}
+                      />
                     ))
                   ) : (
-                    <Chip text="未設定" muted shadowClass={glowShadow} />
+                    <Chip text="未設定" muted shadowClass={glowShadow} borderClass={ringLightClass} />
                   )}
                 </div>
               </div>
               <div
                 className={[
-                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 box-border",
+                  ringMediumClass,
                   glowShadow,
                 ].join(" ")}
               >
@@ -293,10 +323,15 @@ export function IntroCard({
                 <div className="mt-2 flex flex-wrap gap-2">
                   {favoriteGameTags.length ? (
                     favoriteGameTags.map((tag, idx) => (
-                      <Chip key={`${tag}-${idx}`} text={tag} shadowClass={glowShadow} />
+                      <Chip
+                        key={`${tag}-${idx}`}
+                        text={tag}
+                        shadowClass={glowShadow}
+                        borderClass={ringLightClass}
+                      />
                     ))
                   ) : (
-                    <Chip text="未設定" muted shadowClass={glowShadow} />
+                    <Chip text="未設定" muted shadowClass={glowShadow} borderClass={ringLightClass} />
                   )}
                 </div>
               </div>
@@ -306,7 +341,8 @@ export function IntroCard({
             <div className="grid min-h-[70px] grid-cols-2 gap-4">
               <div
                 className={[
-                  "h-full overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
+                  "h-full overflow-hidden rounded-3xl bg-white p-3 box-border",
+                  ringMediumClass,
                   glowShadow,
                 ].join(" ")}
               >
@@ -325,7 +361,8 @@ export function IntroCard({
               <div className="grid h-full grid-rows-2 gap-2">
                 <div
                   className={[
-                    "overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
+                    "overflow-hidden rounded-3xl bg-white p-3 box-border",
+                    ringMediumClass,
                     glowShadow,
                   ].join(" ")}
                 >
@@ -336,7 +373,8 @@ export function IntroCard({
                 </div>
                 <div
                   className={[
-                    "overflow-hidden rounded-3xl bg-white p-3 ring-2 ring-black/10 box-border",
+                    "overflow-hidden rounded-3xl bg-white p-3 box-border",
+                    ringMediumClass,
                     glowShadow,
                   ].join(" ")}
                 >
@@ -352,7 +390,8 @@ export function IntroCard({
             <div className="min-h-0 flex flex-col gap-3">
               <div
                 className={[
-                  "min-h-0 flex-1 overflow-hidden rounded-3xl bg-white p-4 ring-2 ring-black/10",
+                  "min-h-0 flex-1 overflow-hidden rounded-3xl bg-white p-4",
+                  ringMediumClass,
                   glowShadow,
                 ].join(" ")}
               >
@@ -372,6 +411,7 @@ export function IntroCard({
                       label={t.label}
                       dataUrl={t.dataUrl}
                       shadowClass={glowShadow}
+                      borderClass={ringMediumClass}
                     />
                   ))}
                 </div>
