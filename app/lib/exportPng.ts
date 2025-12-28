@@ -49,6 +49,33 @@ function drawCover(
   ctx.drawImage(img, dx, dy, drawWidth, drawHeight);
 }
 
+function drawRoundedRect(ctx: CanvasRenderingContext2D, width: number, height: number, radius: number) {
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(width - r, 0);
+  ctx.quadraticCurveTo(width, 0, width, r);
+  ctx.lineTo(width, height - r);
+  ctx.quadraticCurveTo(width, height, width - r, height);
+  ctx.lineTo(r, height);
+  ctx.quadraticCurveTo(0, height, 0, height - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+}
+
+function drawCardShadow(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,0.16)";
+  ctx.shadowBlur = 48;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 18;
+  ctx.fillStyle = "rgba(0,0,0,0.001)";
+  drawRoundedRect(ctx, width, height, 28);
+  ctx.fill();
+  ctx.restore();
+}
+
 export async function exportElementPng615x870({
   element,
   filename,
@@ -95,6 +122,7 @@ export async function exportElementPng615x870({
     drawCover(ctx, bg, width, height, 1.06);
   }
 
+  drawCardShadow(ctx, width, height);
   ctx.drawImage(img, 0, 0, width, height);
 
   const blob = await new Promise<Blob>((resolve, reject) => {

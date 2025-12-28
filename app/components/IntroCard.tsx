@@ -133,9 +133,13 @@ export function IntroCard({
   const fontStyle = data.fontStyle ?? "normal";
   const fontClass = cardFontClassMap[fontStyle];
   const isExport = renderMode === "export";
-  const glowShadow = isExport
-    ? "shadow-[0_6px_16px_rgba(0,0,0,0.16)]"
-    : "shadow-[0_0_12px_rgba(0,0,0,0.18)]";
+  const enableCssShadow = renderMode === "preview";
+  const cardShadowClass = enableCssShadow
+    ? "shadow-[0_18px_48px_rgba(0,0,0,0.12)]"
+    : "";
+  const glowShadow = enableCssShadow
+    ? "shadow-[0_0_12px_rgba(0,0,0,0.18)]"
+    : "";
 
   const playStyleTags = splitTags(data.playStyle);
   const favoriteGameTags = splitTags(data.favoriteGame);
@@ -157,7 +161,7 @@ export function IntroCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-[28px] shadow-[0_18px_48px_rgba(0,0,0,0.12)] ring-1 ring-black/5 ${fontClass}`}
+      className={`relative overflow-hidden rounded-[28px] ring-1 ring-black/5 ${cardShadowClass} ${fontClass}`}
       style={{
         width: CARD_WIDTH,
         height: compact ? "auto" : CARD_HEIGHT,
