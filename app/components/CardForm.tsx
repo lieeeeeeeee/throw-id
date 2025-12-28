@@ -3,7 +3,10 @@
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { CardDraft } from "../lib/schema";
-import { CARD_BACKGROUND_OPTIONS, getCardBackgroundStyle } from "../lib/backgrounds";
+import {
+  CARD_BACKGROUND_OPTIONS,
+  getCardBackgroundPreviewStyle,
+} from "../lib/backgrounds";
 import { cardFontClassMap } from "../lib/cardFonts";
 
 async function fileToDataUrl(file: File): Promise<string> {
@@ -433,9 +436,9 @@ export function CardForm({
                 const checked = background === opt.id;
                 const previewStyle =
                   opt.id === "white"
-                    ? getCardBackgroundStyle(opt.id)
+                    ? getCardBackgroundPreviewStyle(opt.id)
                     : {
-                        ...getCardBackgroundStyle(opt.id),
+                        ...getCardBackgroundPreviewStyle(opt.id),
                         backgroundSize: "190%",
                         backgroundPosition: "center",
                       };

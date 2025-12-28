@@ -63,7 +63,6 @@ export async function exportElementPng615x870({
   background?: {
     color?: string;
     imageSrc?: string | null;
-    blurPx?: number;
   };
 }) {
   // いったん高解像度でレンダ→最終的に指定サイズへダウンスケール
@@ -93,9 +92,7 @@ export async function exportElementPng615x870({
 
   if (background?.imageSrc) {
     const bg = await loadImage(background.imageSrc);
-    ctx.filter = background.blurPx ? `blur(${background.blurPx}px)` : "none";
     drawCover(ctx, bg, width, height, 1.06);
-    ctx.filter = "none";
   }
 
   ctx.drawImage(img, 0, 0, width, height);
@@ -109,6 +106,8 @@ export async function exportElementPng615x870({
 
   downloadBlob(blob, filename);
 }
+
+
 
 
 

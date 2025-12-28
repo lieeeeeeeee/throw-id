@@ -166,19 +166,6 @@ export function IntroCard({
           : backgroundStyle),
       }}
     >
-      {hasPatternBackground && !isExport ? (
-        <div
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{
-            ...backgroundStyle,
-            filter: "blur(3px)",
-            transform: "scale(1.05)",
-            transformOrigin: "center",
-          }}
-        />
-      ) : null}
-
       <div className="relative z-10 flex h-full min-h-0 flex-col box-border px-[28px] py-[26px]">
         {/* Header */}
         <div className="flex items-center gap-4">

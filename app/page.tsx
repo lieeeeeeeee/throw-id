@@ -109,7 +109,6 @@ export default function Home() {
       background: {
         color: "#ffffff",
         imageSrc: getCardBackgroundImageSrc(draft.background ?? "white"),
-        blurPx: 3,
       },
     });
   };
