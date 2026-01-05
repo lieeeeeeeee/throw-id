@@ -9,18 +9,41 @@ async function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+function extractUrls(value: string | null): string[] {
+  if (!value || value === "none") return [];
+  const urls: string[] = [];
+  const re = /url\\((['\"]?)([^)'\"\\s]+)\\1\\)/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(value)) !== null) {
+    urls.push(m[2]);
+  }
+  return urls;
+}
+
 async function ensureImagesLoaded(root: HTMLElement) {
-  const images = Array.from(root.querySelectorAll<HTMLImageElement>("img"));
-  await Promise.all(
-    images.map((img) => {
-      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-      return new Promise<void>((resolve) => {
-        const done = () => resolve();
-        img.onload = done;
-        img.onerror = done;
-      });
-    }),
-  );
+  const imgPromises = Array.from(root.querySelectorAll<HTMLImageElement>("img")).map((img) => {
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      const done = () => resolve();
+      img.onload = done;
+      img.onerror = done;
+    });
+  });
+
+  const elements = [root, ...Array.from(root.querySelectorAll<HTMLElement>("*"))];
+  const bgUrls = elements.flatMap((el) => {
+    const style = getComputedStyle(el);
+    return [
+      ...extractUrls(style.backgroundImage),
+      ...extractUrls(style.maskImage),
+      ...extractUrls(style.webkitMaskImage),
+    ];
+  });
+
+  const uniqueBgUrls = Array.from(new Set(bgUrls)).filter(Boolean);
+  const bgPromises = uniqueBgUrls.map((url) => loadImage(url).catch(() => undefined));
+
+  await Promise.all([...imgPromises, ...bgPromises]);
 }
 
 function drawCover(

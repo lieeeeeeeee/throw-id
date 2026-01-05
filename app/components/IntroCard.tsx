@@ -105,17 +105,20 @@ function ImageBox({
   return (
     <div className="flex flex-col gap-1">
       <div
-        className={[
-          "h-[120px] w-[170px] overflow-hidden rounded-2xl bg-white p-2",
-          borderClass,
-          shadowClass,
-        ].join(" ")}
-      >
-        <div
-          role="img"
-          aria-label={label}
-          className="h-full w-full bg-contain bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${dataUrl})` }}
+      className={[
+        "h-[120px] w-[170px] overflow-hidden rounded-2xl bg-white p-2",
+        borderClass,
+        shadowClass,
+      ].join(" ")}
+    >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={dataUrl}
+          alt={label}
+          className="h-full w-full object-contain"
+          draggable={false}
+          decoding="async"
+          loading="eager"
         />
       </div>
       <div className="text-[11px] font-semibold text-zinc-700">{label}</div>
@@ -175,18 +178,21 @@ export function IntroCard({
       <div className="relative z-10 flex h-full min-h-0 flex-col box-border px-[28px] py-[26px]">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <div
+      <div
         className={[
           "h-[118px] w-[118px] overflow-hidden rounded-[32px] bg-white",
           ringMediumClass,
           glowShadow,
         ].join(" ")}
       >
-            <div
-              role="img"
-              aria-label="icon"
-              className="h-full w-full bg-cover bg-center"
-              style={{ backgroundImage: `url(${iconSrc})` }}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={iconSrc}
+              alt="icon"
+              className="h-full w-full object-cover"
+              draggable={false}
+              decoding="async"
+              loading="eager"
             />
           </div>
 

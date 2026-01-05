@@ -9,39 +9,36 @@ import {
 } from "../lib/backgrounds";
 import { cardFontClassMap } from "../lib/cardFonts";
 
-async function fileToDataUrl(file: File): Promise<string> {
-  const baseDataUrl = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
-    reader.readAsDataURL(file);
-  });
+async function fileToPngDataUrl(file: File): Promise<string> {
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
+      image.src = objectUrl;
+    });
 
-  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
-    image.src = baseDataUrl;
-  });
+    // iOS Safari での data URL 取りこぼしを防ぐため、PNG に揃えつつ適度に縮小
+    const MAX_DIMENSION = 1024;
+    const scale = Math.min(1, MAX_DIMENSION / Math.max(img.width, img.height));
+    const width = Math.max(1, Math.round(img.width * scale));
+    const height = Math.max(1, Math.round(img.height * scale));
 
-  const MAX_DIMENSION = 1200;
-  const scale = Math.min(1, MAX_DIMENSION / Math.max(img.width, img.height));
-  const width = Math.max(1, Math.round(img.width * scale));
-  const height = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvasが使用できません");
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
 
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvasが使用できません");
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.clearRect(0, 0, width, height);
-  ctx.drawImage(img, 0, 0, width, height);
-
-  // iOS Safari が大きな写真や HEIC を含む data URL をそのまま描画できずに
-  // 出力画像から欠けることがあるため、ここで PNG に揃えて縮小しておく。
-  return canvas.toDataURL("image/png");
+    return canvas.toDataURL("image/png");
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
 }
 
 function Section({
@@ -215,6 +212,8 @@ function ImageInput({
             alt={label}
             className="h-full w-full object-cover transition group-hover:scale-[1.02]"
             draggable={false}
+            decoding="async"
+            loading="eager"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-zinc-50 text-3xl font-black text-zinc-300">
@@ -232,7 +231,7 @@ function ImageInput({
             const f = e.target.files?.[0];
             if (!f) return;
             try {
-              const url = await fileToDataUrl(f);
+              const url = await fileToPngDataUrl(f);
               onChange(url);
             } finally {
               inputEl.value = "";
