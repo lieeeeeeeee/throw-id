@@ -86,7 +86,7 @@ function textOrPlaceholder(label: string, value?: string, placeholder = "--") {
 function splitTags(text?: string): string[] {
   if (!text) return [];
   return text
-    .split(/[ ,、./]+/)
+    .split(/[ ,、./:：\u3000]+/)
     .map((t) => t.trim())
     .filter(Boolean);
 }
