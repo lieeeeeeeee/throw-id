@@ -10,12 +10,38 @@ import {
 import { cardFontClassMap } from "../lib/cardFonts";
 
 async function fileToDataUrl(file: File): Promise<string> {
-  return await new Promise((resolve, reject) => {
+  const baseDataUrl = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
     reader.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
     reader.readAsDataURL(file);
   });
+
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
+    image.src = baseDataUrl;
+  });
+
+  const MAX_DIMENSION = 1200;
+  const scale = Math.min(1, MAX_DIMENSION / Math.max(img.width, img.height));
+  const width = Math.max(1, Math.round(img.width * scale));
+  const height = Math.max(1, Math.round(img.height * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvasが使用できません");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.clearRect(0, 0, width, height);
+  ctx.drawImage(img, 0, 0, width, height);
+
+  // iOS Safari が大きな写真や HEIC を含む data URL をそのまま描画できずに
+  // 出力画像から欠けることがあるため、ここで PNG に揃えて縮小しておく。
+  return canvas.toDataURL("image/png");
 }
 
 function Section({
