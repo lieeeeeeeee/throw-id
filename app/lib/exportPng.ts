@@ -9,6 +9,20 @@ async function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+async function ensureImagesLoaded(root: HTMLElement) {
+  const images = Array.from(root.querySelectorAll<HTMLImageElement>("img"));
+  await Promise.all(
+    images.map((img) => {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+      return new Promise<void>((resolve) => {
+        const done = () => resolve();
+        img.onload = done;
+        img.onerror = done;
+      });
+    }),
+  );
+}
+
 function drawCover(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
@@ -52,6 +66,9 @@ export async function exportElementPng615x870({
     imageSrc?: string | null;
   };
 }): Promise<Blob> {
+  // 画像読み込みが終わる前に html-to-image を走らせると iOS Safari で欠けるため、事前に待つ
+  await ensureImagesLoaded(element);
+
   // いったん高解像度でレンダ→最終的に指定サイズへダウンスケール
   const rawDataUrl = await toPng(element, {
     cacheBust: true,
